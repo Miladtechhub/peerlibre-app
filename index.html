@@ -1,0 +1,1990 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="description" content="PeerLibre: publish transparently, review fairly. AI-assisted editorial screening, validated reviewer rewards and verifiable publication records."><link rel="icon" type="image/svg+xml" href="/favicon.svg"><meta property="og:title" content="PeerLibre | Publish Transparently. Review Fairly."></head><body style="margin:0">
+<title>PeerLibre</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Libre+Caslon+Text:ital,wght@0,400;0,700;1,400&family=Libre+Franklin:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: a journal office. Navy rail of roles and tools on the left, a paper-white working desk on the right; the rail becomes a top bar on phones.
+   Identity: Oxford navy and seal gold, set in Libre Caslon (scholarship) and Libre Franklin (interface); mono only for proofs. */
+:root{
+  --bg:#F5F6F7; --surface:#FFFFFF; --surface-2:#EEF0F3; --ink:#14213A; --muted:#5B6578; --line:#E0E3E8;
+  --accent:#13294B; --accent-ink:#FFFFFF; --accent-soft:#E7ECF4; --link:#1F4B8F;
+  --seal:#8F6E2A; --gold:#C9A55A; --seal-soft:#F6EFDD;
+  --ai:#2B6A6E; --ai-soft:#E2EEEE;
+  --ok:#1E6B47; --ok-soft:#E0F0E7; --warn:#9A5512; --warn-soft:#F8ECDD; --bad:#A3281E; --bad-soft:#F8E4E1;
+  --rail:#13294B; --rail-ink:#D9E0EC; --rail-mute:#8D9AB3; --rail-hi:rgba(255,255,255,.08);
+  --shadow:0 1px 2px rgba(20,33,58,.05),0 10px 30px rgba(20,33,58,.07);
+  --f-display:"Libre Caslon Text",Georgia,"Times New Roman",serif;
+  --f-body:"Libre Franklin",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --f-mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+  --r:6px;
+  /* the login hero and the rail keep one navy look in both themes */
+  --hero-bg:#13294B; --hero-fg:#EEF1F6; --hero-seal:#D7B66E;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0C1220; --surface:#131B2B; --surface-2:#1A2436; --ink:#E7EAF0; --muted:#9BA5B7; --line:#263247;
+  --accent:#D7B66E; --accent-ink:#0C1220; --accent-soft:#2A2617; --link:#A9C0EA;
+  --seal:#D7B66E; --gold:#D7B66E; --seal-soft:#2E2715;
+  --ai:#6FC2C6; --ai-soft:#13302F;
+  --ok:#62C493; --ok-soft:#12301F; --warn:#EFA75C; --warn-soft:#352612; --bad:#F08074; --bad-soft:#3A1916;
+  --rail:#09101C; --rail-ink:#D9E0EC; --rail-mute:#7F8BA2; --rail-hi:rgba(255,255,255,.06);
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 10px 30px rgba(0,0,0,.3); color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0C1220; --surface:#131B2B; --surface-2:#1A2436; --ink:#E7EAF0; --muted:#9BA5B7; --line:#263247;
+  --accent:#D7B66E; --accent-ink:#0C1220; --accent-soft:#2A2617; --link:#A9C0EA;
+  --seal:#D7B66E; --gold:#D7B66E; --seal-soft:#2E2715;
+  --ai:#6FC2C6; --ai-soft:#13302F;
+  --ok:#62C493; --ok-soft:#12301F; --warn:#EFA75C; --warn-soft:#352612; --bad:#F08074; --bad-soft:#3A1916;
+  --rail:#09101C; --rail-ink:#D9E0EC; --rail-mute:#7F8BA2; --rail-hi:rgba(255,255,255,.06);
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 10px 30px rgba(0,0,0,.3); color-scheme:dark}
+
+*{box-sizing:border-box}
+html,body{height:100%}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.55;-webkit-font-smoothing:antialiased}
+h1,h2,h3{font-family:var(--f-display);font-weight:500;letter-spacing:-.01em;text-wrap:balance;margin:0}
+h1{font-size:2.1rem;line-height:1.15} h2{font-size:1.55rem;line-height:1.2} h3{font-size:1.15rem;line-height:1.3}
+p{margin:0}
+a{color:var(--accent)}
+button,input,select,textarea{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.mono{font-family:var(--f-mono);font-size:.82em;letter-spacing:-.01em}
+.muted{color:var(--muted)}
+.small{font-size:.86rem}
+.eyebrow{font-size:.72rem;text-transform:uppercase;letter-spacing:.09em;color:var(--muted);font-weight:600}
+.num{font-variant-numeric:tabular-nums}
+.stack{display:flex;flex-direction:column;gap:12px}
+.row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.spread{display:flex;gap:12px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,320px),1fr));gap:16px}
+.grid3{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,230px),1fr));gap:14px}
+.grid2>*,.grid3>*{min-width:0}
+
+/* Buttons */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:1px solid var(--line);background:var(--surface);padding:9px 14px;border-radius:8px;cursor:pointer;font-weight:500;font-size:.92rem;transition:background .15s,border-color .15s,transform .05s;text-decoration:none;color:var(--ink)}
+.btn:hover{border-color:var(--muted)}
+.btn:active{transform:translateY(1px)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.btn.primary:hover{filter:brightness(1.08)}
+.btn.ai{background:var(--ai);border-color:var(--ai);color:var(--surface)}
+.btn.seal{background:var(--seal);border-color:var(--seal);color:var(--surface)}
+.btn.ghost{background:transparent;border-color:transparent}
+.btn.ghost:hover{background:var(--surface-2)}
+.btn.danger{color:var(--bad);border-color:var(--bad)}
+.btn.block{width:100%}
+.btn[disabled]{opacity:.5;cursor:not-allowed}
+.btn svg{width:18px;height:18px;flex:none}
+
+/* Inputs */
+label.field{display:flex;flex-direction:column;gap:6px;font-size:.86rem;font-weight:500}
+.input,select.input,textarea.input{width:100%;padding:10px 12px;border:1px solid var(--line);border-radius:8px;background:var(--surface);font-size:.95rem;font-weight:400}
+textarea.input{min-height:96px;resize:vertical;line-height:1.5}
+.input:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
+.hint{font-weight:400;color:var(--muted);font-size:.8rem}
+
+/* Chips & pills */
+.pill{display:inline-flex;align-items:center;gap:6px;padding:2px 9px;border-radius:999px;font-size:.75rem;font-weight:600;background:var(--surface-2);color:var(--muted);white-space:nowrap}
+.pill.ok{background:var(--ok-soft);color:var(--ok)} .pill.warn{background:var(--warn-soft);color:var(--warn)} .pill.bad{background:var(--bad-soft);color:var(--bad)}
+.pill.ai{background:var(--ai-soft);color:var(--ai)} .pill.seal{background:var(--seal-soft);color:var(--seal)} .pill.accent{background:var(--accent-soft);color:var(--accent)}
+.pill .dot{width:6px;height:6px;border-radius:50%;background:currentColor}
+.tag{display:inline-block;padding:2px 8px;border:1px solid var(--line);border-radius:6px;font-size:.78rem;color:var(--muted)}
+
+/* Cards */
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);padding:18px}
+.card.flat{box-shadow:none}
+.card.raised{box-shadow:var(--shadow)}
+.card.ai-card{border-color:color-mix(in srgb,var(--ai) 40%,var(--line))}
+.divider{height:1px;background:var(--line);margin:4px 0}
+
+/* App shell */
+.shell{display:grid;grid-template-columns:248px 1fr;min-height:100%}
+.rail{position:sticky;top:env(safe-area-inset-top,0px);height:100vh;display:flex;flex-direction:column;gap:6px;padding:18px 14px;border-right:1px solid var(--line);background:var(--surface);overflow-y:auto}
+.brand{display:flex;align-items:center;gap:10px;padding:4px 8px 14px}
+.brand-mark{width:30px;height:30px;flex:none}
+.brand-name{font-family:var(--f-display);font-size:1.35rem;font-weight:600;letter-spacing:-.01em}
+.brand-name em{font-style:italic;font-weight:500;color:var(--accent)}
+.nav-group{display:flex;flex-direction:column;gap:2px;margin-top:6px}
+.nav-label{padding:10px 10px 4px}
+.nav-btn{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:8px;border:0;background:transparent;cursor:pointer;text-align:left;font-size:.92rem;color:var(--ink);width:100%}
+.nav-btn:hover{background:var(--surface-2)}
+.nav-btn.on{background:var(--accent-soft);color:var(--accent);font-weight:600}
+.nav-btn svg{width:18px;height:18px;flex:none;opacity:.85}
+.nav-btn .count{margin-left:auto;font-size:.72rem;background:var(--surface-2);color:var(--muted);border-radius:999px;padding:0 7px;font-weight:600}
+.nav-btn.on .count{background:var(--surface);color:var(--accent)}
+.rail-foot{margin-top:auto;padding-top:14px;border-top:1px solid var(--line);display:flex;flex-direction:column;gap:10px}
+.who{display:flex;gap:10px;align-items:center;min-width:0}
+.avatar{width:34px;height:34px;border-radius:50%;flex:none;display:grid;place-items:center;font-weight:600;font-size:.85rem;color:var(--surface);background:var(--accent)}
+.who-txt{min-width:0}
+.who-txt .n{font-weight:600;font-size:.9rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.who-txt .w{font-size:.75rem;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+.main{min-width:0;padding-inline:clamp(16px,3.5vw,44px);padding-block:22px 64px}
+.topbar{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:22px}
+.balance{display:flex;align-items:center;gap:8px;padding:6px 12px 6px 8px;border-radius:999px;background:var(--seal-soft);color:var(--seal);font-weight:600;font-size:.9rem;border:0;cursor:pointer}
+.balance svg{width:20px;height:20px}
+.role-switch{display:inline-flex;background:var(--surface-2);border-radius:999px;padding:3px;gap:2px}
+.role-switch button{border:0;background:transparent;padding:5px 12px;border-radius:999px;font-size:.82rem;font-weight:500;cursor:pointer;color:var(--muted)}
+.role-switch button.on{background:var(--surface);color:var(--ink);box-shadow:0 1px 2px rgba(0,0,0,.12)}
+.page-head{display:flex;flex-direction:column;gap:6px;margin-bottom:20px;max-width:760px}
+.page-head p{color:var(--muted)}
+.section{display:flex;flex-direction:column;gap:14px;margin-top:26px}
+
+/* Stats */
+.stat .k{font-size:.8rem;color:var(--muted)}
+.stat .v{font-family:var(--f-display);font-size:2rem;line-height:1.1;font-variant-numeric:tabular-nums}
+.stat .v small{font-family:var(--f-body);font-size:.8rem;color:var(--muted);margin-left:4px}
+
+/* Pipeline */
+.pipe{display:flex;gap:0;overflow-x:auto;padding-bottom:4px}
+.pipe .st{flex:1 0 92px;display:flex;flex-direction:column;gap:6px;font-size:.74rem;color:var(--muted);position:relative;padding-right:6px}
+.pipe .bar{height:5px;border-radius:3px;background:var(--surface-2)}
+.pipe .st.done .bar{background:var(--accent)}
+.pipe .st.now .bar{background:linear-gradient(90deg,var(--accent) 50%,var(--surface-2) 50%)}
+.pipe .st.stop .bar{background:var(--bad)}
+.pipe .st.done,.pipe .st.now{color:var(--ink)}
+
+/* Manuscript list */
+.ms{display:grid;grid-template-columns:1fr auto;gap:8px 16px;align-items:start;padding:16px 18px;border-bottom:1px solid var(--line);cursor:pointer;background:var(--surface)}
+.ms:hover{background:color-mix(in srgb,var(--surface-2) 50%,var(--surface))}
+.ms:first-child{border-top-left-radius:var(--r);border-top-right-radius:var(--r)}
+.ms:last-child{border-bottom:0;border-bottom-left-radius:var(--r);border-bottom-right-radius:var(--r)}
+.ms .t{font-family:var(--f-display);font-size:1.08rem;font-weight:500;line-height:1.3}
+.ms .meta{display:flex;gap:10px;flex-wrap:wrap;font-size:.8rem;color:var(--muted)}
+.list{border:1px solid var(--line);border-radius:var(--r);overflow:hidden}
+
+/* Login */
+.auth{min-height:100%;display:grid;grid-template-columns:1.1fr 1fr}
+.auth-hero{position:relative;padding:clamp(24px,5vw,64px);display:flex;flex-direction:column;gap:26px;justify-content:center;background:var(--hero-bg);color:var(--hero-fg);overflow:hidden}
+.auth-hero .brand-mark rect{fill:var(--hero-fg)} .auth-hero .brand-mark path{stroke:var(--hero-bg)} .auth-hero .brand-name em{color:var(--hero-seal)}
+.only-phone{display:none!important}
+.auth-hero h1{font-size:clamp(2.2rem,4.6vw,3.6rem);line-height:1.04;font-weight:500}
+.auth-hero h1 em{font-style:italic;color:var(--hero-seal)}
+.auth-hero p.lead{max-width:34em;opacity:.82;font-size:1.02rem}
+.auth-hero canvas{position:absolute;inset:0;width:100%;height:100%;opacity:.5;pointer-events:none}
+.auth-hero>*:not(canvas){position:relative}
+.flow{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:2px;max-width:560px;font-size:.72rem}
+.flow div{padding:10px 8px;background:rgba(255,255,255,.07);display:flex;flex-direction:column;gap:2px}
+.flow div:first-child{border-radius:8px 0 0 8px}.flow div:last-child{border-radius:0 8px 8px 0}
+.flow b{font-family:var(--f-display);font-size:1.3rem;font-weight:500;color:var(--hero-seal)}
+.auth-panel{display:flex;align-items:center;justify-content:center;padding:clamp(20px,4vw,56px) 16px}
+.auth-card{width:100%;max-width:420px;display:flex;flex-direction:column;gap:18px}
+.or{display:flex;align-items:center;gap:12px;color:var(--muted);font-size:.78rem;text-transform:uppercase;letter-spacing:.08em}
+.or::before,.or::after{content:"";flex:1;height:1px;background:var(--line)}
+.login-opt{display:flex;align-items:center;gap:12px;width:100%;padding:12px 14px;border:1px solid var(--line);border-radius:10px;background:var(--surface);cursor:pointer;text-align:left}
+.login-opt:hover{border-color:var(--accent);background:var(--accent-soft)}
+.login-opt .ic{width:34px;height:34px;border-radius:8px;display:grid;place-items:center;background:var(--surface-2);flex:none}
+.login-opt .ic svg{width:20px;height:20px}
+.login-opt .tx{display:flex;flex-direction:column;min-width:0}
+.login-opt .tx b{font-weight:600;font-size:.94rem}
+.login-opt .tx span{font-size:.8rem;color:var(--muted)}
+.login-opt .go{margin-left:auto;color:var(--muted)}
+.tabs{display:flex;gap:4px;border-bottom:1px solid var(--line)}
+.tabs button{border:0;background:transparent;padding:10px 12px;cursor:pointer;font-weight:500;color:var(--muted);border-bottom:2px solid transparent;margin-bottom:-1px}
+.tabs button.on{color:var(--ink);border-color:var(--accent)}
+.otp{display:grid;grid-template-columns:repeat(6,1fr);gap:8px}
+.otp input{text-align:center;font-family:var(--f-mono);font-size:1.3rem;padding:10px 0}
+.demo-note{font-size:.8rem;padding:10px 12px;border-radius:8px;background:var(--seal-soft);color:var(--seal)}
+
+/* AI editor */
+.ai-head{display:flex;gap:14px;align-items:center}
+.ai-badge{width:42px;height:42px;border-radius:12px;background:var(--ai-soft);color:var(--ai);display:grid;place-items:center;flex:none}
+.ai-badge svg{width:24px;height:24px}
+.score-ring{--p:0;width:96px;height:96px;border-radius:50%;background:conic-gradient(var(--ai) calc(var(--p)*1%),var(--surface-2) 0);display:grid;place-items:center;flex:none}
+.score-ring>div{width:76px;height:76px;border-radius:50%;background:var(--surface);display:grid;place-items:center;text-align:center;line-height:1}
+.score-ring b{font-family:var(--f-display);font-size:1.9rem;font-weight:500}
+.score-ring span{font-size:.65rem;color:var(--muted);display:block;margin-top:2px}
+.bars{display:flex;flex-direction:column;gap:9px}
+.bars .b{display:grid;grid-template-columns:minmax(0,150px) 1fr 34px;gap:10px;align-items:center;font-size:.84rem}
+.bars .track{height:8px;border-radius:4px;background:var(--surface-2);overflow:hidden}
+.bars .fill{height:100%;background:var(--ai);border-radius:4px;transition:width .8s cubic-bezier(.2,.8,.2,1)}
+.bars .fill.low{background:var(--warn)}
+.thinking{display:flex;flex-direction:column;gap:8px}
+.thinking .ln{display:flex;gap:10px;align-items:center;font-size:.9rem;color:var(--muted)}
+.thinking .ln.on{color:var(--ink)}
+.thinking .ln.done{color:var(--ai)}
+.spin{width:14px;height:14px;border-radius:50%;border:2px solid var(--ai-soft);border-top-color:var(--ai);animation:spin .8s linear infinite;flex:none}
+.tick{width:14px;height:14px;flex:none}
+@keyframes spin{to{transform:rotate(360deg)}}
+ul.clean{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:6px}
+.verdict{display:flex;align-items:center;gap:10px;padding:12px 14px;border-radius:8px;font-weight:600}
+.verdict.ok{background:var(--ok-soft);color:var(--ok)} .verdict.warn{background:var(--warn-soft);color:var(--warn)} .verdict.bad{background:var(--bad-soft);color:var(--bad)}
+
+/* Split bar (credit flow) */
+.split{display:flex;height:34px;border-radius:8px;overflow:hidden;gap:2px}
+.split>div{display:flex;align-items:center;justify-content:center;font-size:.72rem;font-weight:600;color:var(--surface);white-space:nowrap;overflow:hidden;transition:flex-grow .6s}
+.legend{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,180px),1fr));gap:8px 16px;font-size:.84rem}
+.legend div{display:flex;gap:8px;align-items:baseline}
+.legend i{width:10px;height:10px;border-radius:3px;flex:none;display:inline-block;transform:translateY(1px)}
+
+/* Drop zone */
+.drop{border:1.5px dashed var(--line);border-radius:var(--r);padding:22px;text-align:center;display:flex;flex-direction:column;gap:8px;align-items:center;cursor:pointer;background:var(--surface)}
+.drop.over,.drop:hover{border-color:var(--accent);background:var(--accent-soft)}
+.drop svg{width:28px;height:28px;color:var(--accent)}
+
+/* Stepper */
+.stepper{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:18px}
+.stepper div{display:flex;align-items:center;gap:8px;font-size:.84rem;color:var(--muted);padding:6px 12px 6px 6px;border-radius:999px;background:var(--surface-2)}
+.stepper div b{width:22px;height:22px;border-radius:50%;display:grid;place-items:center;background:var(--surface);font-size:.75rem}
+.stepper div.on{background:var(--accent-soft);color:var(--accent);font-weight:600}
+.stepper div.on b{background:var(--accent);color:var(--accent-ink)}
+.stepper div.done b{background:var(--ok);color:var(--surface)}
+
+/* Ledger */
+.ledger{width:100%;border-collapse:collapse;font-size:.84rem}
+.ledger th{text-align:left;font-weight:600;color:var(--muted);font-size:.74rem;text-transform:uppercase;letter-spacing:.06em;padding:10px 12px;border-bottom:1px solid var(--line);white-space:nowrap}
+.ledger td{padding:10px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+.ledger tr:last-child td{border-bottom:0}
+.tbl-wrap{overflow-x:auto;border:1px solid var(--line);border-radius:var(--r);background:var(--surface)}
+.chain-line{display:flex;flex-direction:column;gap:0;position:relative}
+.ev{display:grid;grid-template-columns:22px 1fr;gap:12px;padding-bottom:16px;position:relative}
+.ev::before{content:"";position:absolute;left:10px;top:20px;bottom:0;width:2px;background:var(--line)}
+.ev:last-child::before{display:none}
+.ev .node{width:22px;height:22px;border-radius:50%;background:var(--surface);border:2px solid var(--accent);display:grid;place-items:center;z-index:1}
+.ev .node.ai{border-color:var(--ai)} .ev .node.seal{border-color:var(--seal)} .ev .node.ok{border-color:var(--ok)} .ev .node.bad{border-color:var(--bad)}
+.ev .node::after{content:"";width:8px;height:8px;border-radius:50%;background:currentColor}
+.ev .node{color:var(--accent)} .ev .node.ai{color:var(--ai)} .ev .node.seal{color:var(--seal)} .ev .node.ok{color:var(--ok)} .ev .node.bad{color:var(--bad)}
+.hash{font-family:var(--f-mono);font-size:.76rem;color:var(--muted);word-break:break-all}
+
+/* Market */
+.item .price{font-family:var(--f-display);font-size:1.4rem;color:var(--seal)}
+.item .kind{display:flex;gap:8px;align-items:center}
+
+/* Modal + toast */
+.scrim{position:fixed;inset:0;background:rgba(10,14,24,.5);display:grid;place-items:center;padding:16px;z-index:50;animation:fade .15s}
+.modal{background:var(--surface);border-radius:14px;max-width:560px;width:100%;max-height:calc(100% - 32px);overflow:auto;padding:22px;display:flex;flex-direction:column;gap:14px;box-shadow:0 20px 60px rgba(0,0,0,.3)}
+@keyframes fade{from{opacity:0}}
+.toasts{position:fixed;right:16px;bottom:calc(16px + env(safe-area-inset-bottom,0px));display:flex;flex-direction:column;gap:8px;z-index:60;max-width:min(380px,calc(100% - 32px))}
+.toast{background:var(--ink);color:var(--bg);padding:12px 14px;border-radius:10px;font-size:.88rem;box-shadow:var(--shadow);animation:rise .25s;display:flex;gap:10px;align-items:flex-start}
+.toast .mono{color:var(--seal)}
+@keyframes rise{from{transform:translateY(10px);opacity:0}}
+.coin-burst{position:fixed;pointer-events:none;z-index:70;font-family:var(--f-display);font-weight:600;color:var(--seal);font-size:1.4rem;animation:burst 1.2s forwards}
+@keyframes burst{to{transform:translateY(-60px);opacity:0}}
+
+.empty{padding:28px;text-align:center;color:var(--muted);border:1px dashed var(--line);border-radius:var(--r);display:flex;flex-direction:column;gap:10px;align-items:center}
+.callout{display:flex;gap:12px;padding:12px 14px;border-radius:8px;background:var(--surface-2);font-size:.88rem}
+.callout svg{width:18px;height:18px;flex:none;margin-top:2px;color:var(--accent)}
+.callout.ai{background:var(--ai-soft)} .callout.ai svg{color:var(--ai)}
+.callout.seal{background:var(--seal-soft)} .callout.seal svg{color:var(--seal)}
+.callout.warn{background:var(--warn-soft)} .callout.warn svg{color:var(--warn)}
+.kv{display:grid;grid-template-columns:max-content 1fr;gap:6px 16px;font-size:.88rem}
+.kv dt{color:var(--muted)} .kv dd{margin:0;min-width:0;overflow-wrap:anywhere}
+.slider-row{display:grid;grid-template-columns:120px 1fr 52px;gap:10px;align-items:center;font-size:.86rem}
+input[type=range]{accent-color:var(--accent);width:100%}
+.formula{font-family:var(--f-display);font-size:1.25rem;padding:12px 14px;background:var(--surface-2);border-radius:8px;text-align:center;font-variant-numeric:tabular-nums}
+.formula b{color:var(--seal);font-weight:600}
+.check{display:flex;gap:10px;align-items:flex-start;font-size:.9rem}
+.check input{margin-top:4px;accent-color:var(--accent)}
+.rolecards{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.rolecard{border:1px solid var(--line);border-radius:10px;padding:12px;cursor:pointer;display:flex;flex-direction:column;gap:4px;font-size:.82rem;color:var(--muted);background:var(--surface)}
+.rolecard b{color:var(--ink);font-size:.95rem}
+.rolecard.on{border-color:var(--accent);background:var(--accent-soft)}
+.rolecard input{position:absolute;opacity:0;pointer-events:none}
+
+@media (max-width:900px){
+  .auth{grid-template-columns:1fr}
+  .auth-hero{padding-block:36px}
+  .flow{grid-template-columns:repeat(5,minmax(0,1fr))}
+}
+@media (max-width:820px){
+  .shell{grid-template-columns:1fr}
+  .rail{position:static;height:auto;flex-direction:row;align-items:center;gap:4px;padding:10px 12px;border-right:0;border-bottom:1px solid var(--line);overflow-x:auto}
+  .brand{padding:0 8px 0 0}
+  .rail .brand-name{display:none}
+  .only-phone{display:inline-flex!important}
+  .nav-group{flex-direction:row;margin:0}
+  .nav-label,.rail-foot,.nav-btn .count{display:none}
+  .nav-btn{white-space:nowrap;padding:7px 10px}
+  .ms{grid-template-columns:1fr}
+  .rolecards{grid-template-columns:1fr}
+  .flow{font-size:.66rem}.flow b{font-size:1.05rem}
+}
+
+/* ===== Identity v2: classic journal office ===== */
+#app{min-height:100vh} .auth{min-height:100vh}
+.rail .brand-sub{letter-spacing:.12em;font-size:.54rem;white-space:nowrap}
+.provider-row .login-opt{position:relative;padding-right:56px}
+.provider-row .live-chip{position:absolute;top:8px;right:8px}
+.grid4{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,150px),1fr));gap:14px}
+.grid4>*{min-width:0}
+h1,h2,h3{font-weight:400;letter-spacing:-.005em}
+h1{font-size:2.15rem;line-height:1.15} h2{font-size:1.45rem} h3{font-size:1.1rem;font-weight:700}
+a{color:var(--link)}
+.eyebrow{font-size:.7rem;letter-spacing:.14em;font-weight:600}
+.btn{border-radius:4px;font-weight:600;font-size:.88rem;letter-spacing:.01em;padding:10px 16px}
+.btn.primary{background:var(--accent);border-color:var(--accent)}
+.btn.seal{background:var(--gold);border-color:var(--gold);color:#13294B}
+.btn.ai{background:var(--ai);border-color:var(--ai)}
+.card{border-radius:var(--r);transition:box-shadow .2s,border-color .2s}
+.pill{border-radius:3px;font-size:.7rem;letter-spacing:.03em;text-transform:uppercase;padding:3px 8px}
+.pill .dot{display:none}
+.tag{border-radius:3px}
+.input,select.input,textarea.input{border-radius:4px}
+.page-head{gap:8px;padding-bottom:18px;margin-bottom:22px;border-bottom:1px solid var(--line);position:relative}
+.page-head::after{content:"";position:absolute;left:0;bottom:-1px;width:56px;height:2px;background:var(--gold)}
+.page-head h1{font-size:2.3rem}
+
+/* Rail */
+.rail{background:var(--rail);border-right:0;color:var(--rail-ink);padding:22px 14px}
+.brand{padding:2px 8px 20px;gap:12px}
+.brand-mark{width:38px;height:38px}
+.brand-name{font-family:var(--f-display);font-weight:700;font-size:1.32rem;letter-spacing:0}
+.brand-name em{font-weight:400;color:var(--hero-seal)}
+.rail .brand-name{color:#fff}
+.brand-txt{display:flex;flex-direction:column;line-height:1.1}
+.brand-sub{display:block;font-family:var(--f-body);font-size:.58rem;letter-spacing:.2em;color:var(--rail-mute);font-weight:600;margin-top:2px}
+.nav-btn{color:var(--rail-ink);border-radius:4px;position:relative;font-size:.9rem;padding:9px 12px}
+.nav-btn:hover{background:var(--rail-hi)}
+.nav-btn.on{background:rgba(255,255,255,.1);color:#fff;font-weight:600}
+.nav-btn.on::before{content:"";position:absolute;left:-14px;top:8px;bottom:8px;width:3px;background:var(--hero-seal);border-radius:0 2px 2px 0}
+.nav-btn .count{background:rgba(255,255,255,.12);color:var(--rail-ink)}
+.nav-btn.on .count{background:var(--hero-seal);color:#13294B}
+.nav-sep{height:1px;background:rgba(255,255,255,.08);margin:10px 8px}
+.rail-foot{border-top:1px solid rgba(255,255,255,.1)}
+.rail .who-txt .n{color:#fff} .rail .who-txt .w{color:var(--rail-mute)}
+.rail .avatar{background:var(--hero-seal);color:#13294B}
+.rail .btn.ghost{color:var(--rail-ink)} .rail .btn.ghost:hover{background:var(--rail-hi)}
+.topbar{padding-bottom:14px}
+.balance{border-radius:4px;background:var(--seal-soft);color:var(--seal);border:1px solid color-mix(in srgb,var(--gold) 45%,transparent)}
+.role-switch{border-radius:4px}.role-switch button{border-radius:3px}
+
+/* Lists and rows */
+.list{border-radius:var(--r);background:var(--surface)}
+.ms{transition:background .15s}
+.ms .t{font-size:1.06rem;font-weight:400}
+.ms:hover .t{color:var(--link)}
+.stat .v{font-family:var(--f-display);font-size:2.1rem}
+.stat{position:relative;overflow:hidden}
+
+/* Welcome banner */
+.banner{position:relative;overflow:hidden;background:var(--hero-bg);color:var(--hero-fg);border-radius:var(--r);padding:clamp(20px,3vw,32px);display:grid;grid-template-columns:minmax(0,1fr) auto;gap:20px;align-items:center;margin-bottom:22px}
+.banner canvas{position:absolute;inset:0;width:100%;height:100%;opacity:.55;pointer-events:none}
+.banner>*:not(canvas){position:relative}
+.banner h1{color:#fff;font-size:clamp(1.7rem,3vw,2.3rem)}
+.banner p{color:rgba(238,241,246,.78);max-width:46em}
+.banner .eyebrow{color:var(--hero-seal)}
+.banner .btn.primary{background:var(--hero-seal);border-color:var(--hero-seal);color:#13294B}
+.banner .btn.ghost{color:#fff;border-color:rgba(255,255,255,.3)}
+
+/* Login */
+.auth{grid-template-columns:minmax(0,1.15fr) minmax(0,1fr)}
+.auth-hero{background:var(--hero-bg);gap:30px}
+.auth-hero h1{font-size:clamp(2.3rem,4.4vw,3.7rem);font-weight:400;line-height:1.06;color:#fff}
+.auth-hero h1 em{color:var(--hero-seal)}
+.auth-hero .eyebrow{color:var(--hero-seal)}
+.hero-brand{display:flex;align-items:center;gap:14px}
+.hero-brand .brand-name{font-size:1.7rem;color:#fff}
+.hero-brand .brand-sub{color:rgba(238,241,246,.6)}
+.cert{max-width:470px;background:rgba(255,255,255,.04);border:1px solid rgba(215,182,110,.45);border-radius:4px;padding:18px 20px;display:flex;flex-direction:column;gap:12px;position:relative;backdrop-filter:blur(2px)}
+.cert::before{content:"";position:absolute;inset:4px;border:1px solid rgba(215,182,110,.18);border-radius:2px;pointer-events:none}
+.cert-head{padding-right:46px;display:flex;justify-content:space-between;align-items:baseline;gap:12px;font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;color:var(--hero-seal);font-weight:600}
+.cert-title{font-family:var(--f-display);font-size:1.05rem;color:#fff;line-height:1.35}
+.cert-steps{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:6px}
+.cert-steps div{display:flex;flex-direction:column;gap:6px;font-size:.66rem;color:rgba(238,241,246,.55);letter-spacing:.02em}
+.cert-steps i{height:3px;background:rgba(255,255,255,.14);border-radius:2px;transition:background .5s}
+.cert-steps div.on{color:#fff} .cert-steps div.on i{background:var(--hero-seal)}
+.cert-hash{font-family:var(--f-mono);font-size:.7rem;color:rgba(238,241,246,.6);word-break:break-all;min-height:2.4em}
+.cert-seal{position:absolute;right:-18px;top:-22px;width:74px;height:74px;transform:rotate(-12deg) scale(.4);opacity:0;transition:transform .45s cubic-bezier(.2,1.6,.4,1),opacity .3s}
+.cert-seal.on{transform:rotate(-12deg) scale(1);opacity:1}
+.auth-panel{background:var(--bg)}
+.auth-card h2{font-size:1.8rem}
+.login-opt{border-radius:4px;padding:13px 14px}
+.login-opt:hover{border-color:var(--accent);background:var(--surface)}
+.login-opt .ic{border-radius:4px}
+.provider-row{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.live-chip{font-size:.62rem;letter-spacing:.08em;text-transform:uppercase;font-weight:700;padding:2px 6px;border-radius:3px;background:var(--ok-soft);color:var(--ok);margin-left:auto}
+.live-chip.demo{background:var(--surface-2);color:var(--muted)}
+
+/* AI and data */
+.score-ring>div{background:var(--surface)}
+.score-ring b{font-weight:400}
+.formula{font-family:var(--f-display);border:1px solid var(--line);background:var(--surface)}
+.verdict{border-radius:4px}
+.ledger th{font-size:.68rem;letter-spacing:.1em}
+.stepper div{border-radius:4px}
+.stepper div.on{background:var(--accent);color:var(--accent-ink)}
+.stepper div.on b{background:var(--accent-ink);color:var(--accent)}
+.rolecard{border-radius:4px}
+.drop{border-radius:4px}
+.toast{border-radius:4px;background:var(--hero-bg);color:#fff;border-left:3px solid var(--hero-seal)}
+.toast .mono{color:var(--hero-seal)}
+.coin-burst{color:var(--gold);font-family:var(--f-display)}
+.fade-in{animation:rise .35s ease-out both}
+@media (hover:hover){ .card.lift:hover{box-shadow:var(--shadow);border-color:color-mix(in srgb,var(--accent) 25%,var(--line))} }
+@media (max-width:900px){ .cert{max-width:none} .banner{grid-template-columns:1fr} }
+@media (max-width:820px){
+  .rail{padding:10px 12px}
+  .rail .brand-sub{display:none}
+  .nav-btn.on::before{left:8px;right:8px;top:auto;bottom:0;width:auto;height:2px}
+  .nav-sep{display:none}
+  .provider-row{grid-template-columns:1fr}
+}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+
+<div id="app"></div>
+<script>
+/* ============ PeerLibre v1 prototype ============
+   Everything runs in the browser. Chain events are simulated (testnet-style) and kept per viewer.
+   Only hashes and event metadata are written to the "ledger"; manuscript text stays in local state. */
+
+const STORE_KEY = "peerlibre.v1";
+const FEE = 100;                       // submission fee in tPLIB credits (white paper Table 6)
+const SPLIT = [                        // 100 tPLIB workflow allocation
+  {k:"reviewer", label:"Reviewer reward pool", amt:60, color:"var(--seal)"},
+  {k:"editorial", label:"Editorial & integrity", amt:15, color:"var(--accent)"},
+  {k:"tech", label:"Technical workflow & storage", amt:10, color:"var(--ai)"},
+  {k:"waiver", label:"Researcher inclusion (waivers)", amt:10, color:"var(--ok)"},
+  {k:"treasury", label:"Community development", amt:5, color:"var(--muted)"}
+];
+const BASE_REWARD = 30;                // B: base reward per validated review
+const SLOTS = 2;                       // reviewers per manuscript
+const WELCOME = 250;
+
+const JOURNALS = [
+  {id:"jori", name:"Journal of Open Research & Integrity", short:"JORI", tier:"Q1 target",
+   threshold:72, scope:"Research integrity, peer review, open science infrastructure, scholarly communication, meta-research and research evaluation.",
+   bar:"Rigorous, original empirical or theoretical contribution with transparent methods, adequate sample or evidence, engagement with current literature, and clear implications for research practice."},
+  {id:"dis", name:"Digital Innovation & Society Letters", short:"DISL", tier:"Q2 target",
+   threshold:62, scope:"Technology adoption, blockchain and Web3 applications, AI in organisations, digital platforms, innovation management and technology policy.",
+   bar:"Sound method and clear contribution; short communications and well-designed pilot studies are welcome if limitations are acknowledged."},
+  {id:"acr", name:"Applied Computing Reviews", short:"ACR", tier:"Q2 target",
+   threshold:65, scope:"Applied machine learning, software systems, human-computer interaction, distributed systems and their evaluation.",
+   bar:"Reproducible methods, comparison with baselines, public code or data where possible, and evaluation that supports the claims."}
+];
+
+const MARKET = [
+  {id:"m1", kind:"Conference", title:"Registration discount, Asia-Pacific Research Integrity Forum 2027", partner:"APRIF (pilot partner)", price:60},
+  {id:"m2", kind:"Training", title:"Systematic review methods, 4-week online course", partner:"Methods Lab (pilot partner)", price:45},
+  {id:"m3", kind:"Software", title:"Reference manager Pro, 12 months", partner:"Research tools vendor (pilot)", price:25},
+  {id:"m4", kind:"Books", title:"Academic e-book credit, any title up to USD 40", partner:"Scholarly bookseller (pilot)", price:35},
+  {id:"m5", kind:"Publishing", title:"Language editing, up to 6,000 words", partner:"Editing partner (pilot)", price:50},
+  {id:"m6", kind:"Waiver", title:"Donate to the researcher waiver pool", partner:"PeerLibre inclusion fund", price:20}
+];
+
+let S = null;     // app state
+let UI = {view:"dashboard", sel:null, step:1, draft:null, loginTab:"wallet", otp:null, pendingUser:null, aiBusy:{}, coach:{}, modal:null, filter:"all"};
+
+/* ---------- utilities ---------- */
+const $ = (s, el=document) => el.querySelector(s);
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const fmt = n => (Math.round(n*100)/100).toLocaleString(undefined,{maximumFractionDigits:2});
+const now = () => Date.now();
+const DAY = 864e5;
+const fdate = t => new Date(t).toLocaleDateString(undefined,{day:"numeric",month:"short",year:"numeric"});
+const ftime = t => new Date(t).toLocaleString(undefined,{day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"});
+const short = h => h ? h.slice(0,10)+"…"+h.slice(-6) : "";
+const rid = (n=8) => Array.from(crypto.getRandomValues(new Uint8Array(n)),b=>b.toString(16).padStart(2,"0")).join("");
+const clamp = (x,a,b) => Math.max(a,Math.min(b,x));
+const initials = n => (n||"?").split(/\s+/).filter(Boolean).slice(0,2).map(w=>w[0].toUpperCase()).join("");
+
+async function sha256(input){
+  const data = typeof input === "string" ? new TextEncoder().encode(input) : input;
+  const buf = await crypto.subtle.digest("SHA-256", data);
+  return "0x"+Array.from(new Uint8Array(buf),b=>b.toString(16).padStart(2,"0")).join("");
+}
+async function saltedHash(bytesOrText, salt){
+  const body = typeof bytesOrText === "string" ? new TextEncoder().encode(bytesOrText) : new Uint8Array(bytesOrText);
+  const s = new TextEncoder().encode(salt);
+  const all = new Uint8Array(s.length+body.length); all.set(s,0); all.set(body,s.length);
+  return sha256(all);
+}
+
+function save(){ try{ localStorage.setItem(STORE_KEY, JSON.stringify(S)); }catch(e){} }
+function load(){ try{ const r = localStorage.getItem(STORE_KEY); return r ? JSON.parse(r) : null; }catch(e){ return null; } }
+
+/* ---------- ledger (simulated testnet) ---------- */
+const EVENT_INFO = {
+  AccountLinked:{c:"accent", label:"Account linked"},
+  SubmissionProof:{c:"accent", label:"Submission proof"},
+  FeeEscrowed:{c:"seal", label:"Fee split into pools"},
+  AIScreeningLogged:{c:"ai", label:"AI Editor screening logged"},
+  EditorDecision:{c:"accent", label:"Editor decision"},
+  ReviewerAssigned:{c:"seal", label:"Reviewer reward reserved"},
+  ReviewSubmitted:{c:"accent", label:"Review submitted"},
+  ReviewValidated:{c:"ok", label:"Review validated"},
+  RewardReleased:{c:"seal", label:"Reward released"},
+  EscrowReturned:{c:"seal", label:"Escrow returned"},
+  RevisionProof:{c:"accent", label:"Revision proof"},
+  Published:{c:"ok", label:"Publication record"},
+  Redeemed:{c:"seal", label:"Credits redeemed"},
+  CreditsIssued:{c:"seal", label:"Credits issued"},
+  ReputationAttested:{c:"ok", label:"Reputation attested"}
+};
+async function chain(type, msId, data={}){
+  S.block += 1 + Math.floor(Math.random()*3);
+  const ev = {type, msId:msId||null, at:now(), block:S.block, data};
+  ev.tx = await sha256(JSON.stringify(ev)+rid(4));
+  S.ledger.unshift(ev);
+  return ev;
+}
+function credit(delta, memo, msId){
+  S.credits = Math.round((S.credits + delta)*100)/100;
+  S.tx.unshift({delta, memo, msId:msId||null, at:now(), bal:S.credits});
+}
+
+/* ---------- AI: Claude via the page's sample capability, heuristic fallback ---------- */
+let samplePromise = null;
+function getSample(){
+  if(!samplePromise){
+    samplePromise = (window.claude && typeof window.claude.use === "function")
+      ? window.claude.use("sample").catch(()=>null) : Promise.resolve(null);
+  }
+  return samplePromise;
+}
+
+const AI_CRITERIA = [
+  ["scope_fit","Scope fit"],["originality","Originality"],["methodological_rigor","Method rigour"],
+  ["evidence_quality","Evidence & data"],["literature_engagement","Literature"],["clarity","Clarity & structure"],["ethics_transparency","Ethics & transparency"]
+];
+
+function editorPrompt(ms, j){
+  const text = (ms.text||"").slice(0, 14000);
+  return `You are the AI Editor of "${j.name}", a scholarly journal on the PeerLibre platform. You perform the first, advisory editorial screening of a new submission. A human editor makes every decision; your job is to give them a fair, specific, evidence-based assessment.
+
+Journal scope: ${j.scope}
+Journal quality bar (${j.tier}): ${j.bar}
+Score threshold for sending to peer review: ${j.threshold}/100.
+
+Assess the submission against the journal's quality bar. Be calibrated: most submissions are not top-tier. Do not reward length or buzzwords. If the text is too short to judge something, say so and score it conservatively. Never invent facts about the paper.
+
+Return ONLY a JSON object with exactly these keys:
+{
+ "scores": {"scope_fit":0-10,"originality":0-10,"methodological_rigor":0-10,"evidence_quality":0-10,"literature_engagement":0-10,"clarity":0-10,"ethics_transparency":0-10},
+ "overall": 0-100 integer,
+ "tier_estimate": one of "Q1","Q2","Q3","Q4","Below indexing standard",
+ "recommendation": one of "send_to_review","revise_before_review","desk_reject",
+ "confidence": 0-1,
+ "summary": "2-3 sentence editor-facing summary",
+ "strengths": ["..."] (2-4 items),
+ "concerns": ["..."] (2-5 items, specific),
+ "questions_for_authors": ["..."] (2-4 items),
+ "suggested_reviewer_expertise": ["..."] (2-4 short expertise tags),
+ "integrity_notes": ["..."] (0-3 items: e.g. missing ethics approval, data availability, possible overclaiming; empty if none)
+}
+
+SUBMISSION
+Article type: ${ms.type}
+Title: ${ms.title}
+Keywords: ${(ms.keywords||[]).join(", ")}
+Abstract: ${ms.abstract}
+Manuscript text (may be truncated):
+${text || "(no full text supplied; judge from title and abstract only and lower confidence)"}`;
+}
+
+function heuristicEditor(ms, j){
+  const t = ((ms.title||"")+" "+(ms.abstract||"")+" "+(ms.text||"")).toLowerCase();
+  const has = w => w.some(x=>t.includes(x));
+  const len = (ms.text||ms.abstract||"").split(/\s+/).length;
+  const scopeWords = j.scope.toLowerCase().split(/[^a-z]+/).filter(w=>w.length>4);
+  const hits = scopeWords.filter(w=>t.includes(w)).length;
+  const sc = {
+    scope_fit: clamp(3+hits*1.2,2,9.5),
+    originality: has(["novel","first","new approach","we propose","contribution"])?6.5:5,
+    methodological_rigor: (has(["method","design","sample","survey","experiment","regression","model"])?5.5:3.5)+(has(["robust","validity","reliab"])?1.5:0),
+    evidence_quality: (has(["data","results","n =","n=","%","significant","table"])?5.5:3.5)+(len>2500?1:0),
+    literature_engagement: has(["et al","literature","prior work","references","["])?6:3.5,
+    clarity: len>150?6.5:5,
+    ethics_transparency: (has(["ethic","consent","irb","approval"])?6:4)+(has(["data availability","open data","github","osf"])?1.5:0)
+  };
+  Object.keys(sc).forEach(k=>sc[k]=Math.round(clamp(sc[k],1,9.5)*10)/10);
+  const overall = Math.round(Object.values(sc).reduce((a,b)=>a+b,0)/7*10);
+  const rec = overall>=j.threshold ? "send_to_review" : overall>=j.threshold-15 ? "revise_before_review" : "desk_reject";
+  return {
+    scores:sc, overall, tier_estimate: overall>=78?"Q1":overall>=66?"Q2":overall>=55?"Q3":overall>=45?"Q4":"Below indexing standard",
+    recommendation:rec, confidence:.35,
+    summary:`Rule-based screening (the AI model was not available in this view). Scores come from keyword and structure signals, so treat them as a rough first pass only.`,
+    strengths:[hits>2?"Topic overlaps clearly with the journal scope.":"Submission is complete enough to screen.", len>1500?"Full text supplied for assessment.":"Abstract is readable and structured."],
+    concerns:[sc.methodological_rigor<6?"Methods are not described in enough detail to judge rigour.":"Check that the method supports the claims.", sc.ethics_transparency<6?"No ethics approval or data availability statement detected.":"Confirm data and code availability.", sc.literature_engagement<6?"Limited visible engagement with prior literature.":"Make the contribution against prior work explicit."],
+    questions_for_authors:["What is the main contribution relative to the closest prior work?","Where can reviewers access the data and analysis code?"],
+    suggested_reviewer_expertise:(ms.keywords||[]).slice(0,3),
+    integrity_notes: sc.ethics_transparency<6?["Ethics statement not found in supplied text."]:[]
+  };
+}
+
+function normalizeEditor(r, ms, j){
+  const out = Object.assign(heuristicEditor(ms,j), r||{});
+  out.scores = Object.assign({}, heuristicEditor(ms,j).scores, (r&&r.scores)||{});
+  Object.keys(out.scores).forEach(k=>out.scores[k]=clamp(Number(out.scores[k])||0,0,10));
+  out.overall = clamp(Math.round(Number(out.overall)||0),0,100);
+  if(!["send_to_review","revise_before_review","desk_reject"].includes(out.recommendation)) out.recommendation="revise_before_review";
+  ["strengths","concerns","questions_for_authors","suggested_reviewer_expertise","integrity_notes"].forEach(k=>{ if(!Array.isArray(out[k])) out[k]=[]; out[k]=out[k].map(String).slice(0,6); });
+  out.confidence = clamp(Number(out.confidence)||.5,0,1);
+  return out;
+}
+
+async function runAIEditor(ms){
+  const j = JOURNALS.find(x=>x.id===ms.journalId);
+  const sample = await getSample();
+  let report=null, source="heuristic";
+  if(sample){
+    try{
+      const r = await sample.json(editorPrompt(ms,j), {modelTier:"default"});
+      report = normalizeEditor(r, ms, j); source="claude";
+    }catch(e){
+      if(e && e.code==="not_granted") toast("AI Editor permission was declined, so a rule-based screen was used.");
+      else toast("The AI Editor could not respond ("+(e&&e.code||"error")+"), so a rule-based screen was used.");
+    }
+  }
+  if(!report){ await new Promise(r=>setTimeout(r,1600)); report = normalizeEditor(heuristicEditor(ms,j), ms, j); }
+  report.source = source; report.at = now(); report.journalThreshold = j.threshold;
+  return report;
+}
+
+/* Review coach: checks completeness and tone. It is told never to weigh the recommendation. */
+function coachPrompt(ms, f){
+  return `You are the Review Quality Assistant on PeerLibre. You check whether a peer review report is complete, specific and professional, so an editor can validate it before the reviewer is rewarded.
+
+Rules:
+- Judge ONLY completeness, specificity, engagement with the manuscript, constructiveness and professional tone.
+- You MUST NOT consider whether the reviewer recommends accept, revise or reject. The reward must never depend on the recommendation.
+- Suggest a quality factor Q between 0.80 and 1.20 (1.00 = meets the standard).
+
+Manuscript title: ${ms.title}
+Abstract: ${ms.abstract}
+
+REVIEW REPORT
+Contribution & originality: ${f.contribution||"(empty)"}
+Methodological quality: ${f.method||"(empty)"}
+Evidence & results: ${f.evidence||"(empty)"}
+Clarity & presentation: ${f.clarity||"(empty)"}
+Ethical issues: ${f.ethics||"(empty)"}
+Required revisions: ${f.revisions||"(empty)"}
+Confidential note to editor: ${f.confidential||"(empty)"}
+
+Return ONLY JSON:
+{"completeness":0-100,"sections":{"contribution":"strong|adequate|thin|missing","method":"...","evidence":"...","clarity":"...","ethics":"...","revisions":"..."},"specificity":"high|medium|low","tone_flags":["..."],"suggestions":["..."] (1-4 concrete ways to improve the report),"suggested_Q":0.80-1.20,"rationale":"one sentence"}`;
+}
+function heuristicCoach(f){
+  const keys = ["contribution","method","evidence","clarity","ethics","revisions"];
+  const sections = {}; let total=0;
+  keys.forEach(k=>{ const w=(f[k]||"").trim().split(/\s+/).filter(Boolean).length; total+=w;
+    sections[k] = w===0?"missing":w<15?"thin":w<45?"adequate":"strong"; });
+  const missing = keys.filter(k=>sections[k]==="missing").length, thin = keys.filter(k=>sections[k]==="thin").length;
+  const completeness = clamp(Math.round(100 - missing*16 - thin*7 + Math.min(10,total/40)),5,100);
+  const tone = /(stupid|nonsense|garbage|idiot|worthless|lazy)/i.test(Object.values(f).join(" ")) ? ["Wording may read as dismissive; keep critique about the work."] : [];
+  const q = clamp(0.8 + (completeness/100)*0.4 - (tone.length?0.1:0), .8, 1.2);
+  return {completeness, sections, specificity: total>250?"high":total>110?"medium":"low", tone_flags:tone,
+    suggestions: keys.filter(k=>sections[k]==="missing"||sections[k]==="thin").slice(0,3).map(k=>`Expand the ${k} section with specific points tied to sections, tables or claims in the manuscript.`).concat(total<110?["Reference specific pages, figures or analyses so the author can act on each point."]:[]),
+    suggested_Q: Math.round(q*100)/100, rationale:"Rule-based check of section length and coverage (AI model unavailable in this view)."};
+}
+async function runCoach(ms, f){
+  const sample = await getSample();
+  if(sample){
+    try{
+      const r = await sample.json(coachPrompt(ms,f), {modelTier:"quick"});
+      const h = heuristicCoach(f);
+      const out = Object.assign(h, r||{});
+      out.suggested_Q = Math.round(clamp(Number(out.suggested_Q)||1,.8,1.2)*100)/100;
+      out.completeness = clamp(Math.round(Number(out.completeness)||0),0,100);
+      if(!Array.isArray(out.suggestions)) out.suggestions=[]; if(!Array.isArray(out.tone_flags)) out.tone_flags=[];
+      out.source="claude"; return out;
+    }catch(e){ /* fall through */ }
+  }
+  await new Promise(r=>setTimeout(r,700));
+  return Object.assign(heuristicCoach(f),{source:"heuristic"});
+}
+
+/* Reward formula from the white paper: R = B × Q × T × C */
+function timeliness(rv){
+  if(!rv.submittedAt) return 1;
+  const days = (rv.submittedAt - rv.acceptedAt)/DAY, allowed = (rv.dueAt - rv.acceptedAt)/DAY;
+  const r = days/allowed;
+  return Math.round(clamp(1.10 - r*0.2, .9, 1.1)*100)/100;
+}
+function reward(B,Q,T,C){ return Math.round(B*Q*T*C*100)/100; }
+
+/* Integrity flags for human attention (never automatic sanctions) */
+function integrityFlags(ms, rv){
+  const flags=[];
+  const mins = rv.submittedAt && rv.acceptedAt ? (rv.submittedAt-rv.acceptedAt)/6e4 : null;
+  const words = Object.values(rv.form||{}).join(" ").split(/\s+/).filter(Boolean).length;
+  if(mins!==null && mins<20 && words>0) flags.push("Report submitted within "+Math.max(1,Math.round(mins))+" minutes of accepting. Check depth of engagement.");
+  const others = (ms.reviews||[]).filter(o=>o!==rv && o.form);
+  others.forEach(o=>{ const a=new Set((o.form.method||"").toLowerCase().split(/\W+/).filter(w=>w.length>5)), b=(rv.form.method||"").toLowerCase().split(/\W+/).filter(w=>w.length>5);
+    const ov=b.filter(w=>a.has(w)).length; if(b.length>8 && ov/b.length>.7) flags.push("High text overlap with another report on this manuscript."); });
+  if(S.user && rv.reviewerId===S.user.id && ms.authorId===S.user.id) flags.push("Reviewer is the author.");
+  if(S.user && rv.reviewerId===S.user.id && S.user.activeRole==="editor") flags.push("You are validating your own review. In a live journal another editor would do this.");
+  return flags;
+}
+
+/* ---------- icons ---------- */
+const I = {
+  home:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg>',
+  upload:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 16V4m0 0l-5 5m5-5l5 5M4 20h16"/></svg>',
+  doc:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M14 3H6a1 1 0 0 0-1 1v16a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V8z"/><path d="M14 3v5h5M8 13h8M8 17h6"/></svg>',
+  review:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 5h16v11H8l-4 4z"/><path d="M8 9h8M8 12h5"/></svg>',
+  desk:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 7h18M5 7v12h14V7M9 11h6"/><path d="M8 7V4h8v3"/></svg>',
+  chain:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="8" width="8" height="8" rx="2"/><rect x="13" y="8" width="8" height="8" rx="2"/><path d="M11 12h2"/></svg>',
+  market:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 9l1.5-5h13L20 9M4 9h16v11H4zM4 9a3 3 0 0 0 5.3 1.9A3 3 0 0 0 12 12a3 3 0 0 0 2.7-1.1A3 3 0 0 0 20 9"/></svg>',
+  coin:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="8.5"/><path d="M9 9.5h4.5a2 2 0 0 1 0 4H9.5m0-4v7m0-3h4.5"/></svg>',
+  ai:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 3l1.8 4.7L18.5 9.5l-4.7 1.8L12 16l-1.8-4.7L5.5 9.5l4.7-1.8z"/><path d="M18 15l.8 2.2L21 18l-2.2.8L18 21l-.8-2.2L15 18l2.2-.8z"/></svg>',
+  wallet:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 7a2 2 0 0 1 2-2h11v4"/><rect x="3" y="9" width="18" height="11" rx="2"/><circle cx="16.5" cy="14.5" r="1.2" fill="currentColor"/></svg>',
+  mail:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg>',
+  google:'<svg viewBox="0 0 24 24"><path fill="#4285F4" d="M21.6 12.2c0-.7-.1-1.4-.2-2H12v3.8h5.4a4.6 4.6 0 0 1-2 3v2.5h3.2c1.9-1.7 3-4.3 3-7.3z"/><path fill="#34A853" d="M12 22c2.7 0 5-.9 6.6-2.4l-3.2-2.5c-.9.6-2 1-3.4 1-2.6 0-4.8-1.8-5.6-4.1H3.1v2.6A10 10 0 0 0 12 22z"/><path fill="#FBBC05" d="M6.4 14c-.2-.6-.3-1.3-.3-2s.1-1.4.3-2V7.4H3.1a10 10 0 0 0 0 9.2z"/><path fill="#EA4335" d="M12 5.9c1.5 0 2.8.5 3.8 1.5l2.9-2.9A10 10 0 0 0 3.1 7.4L6.4 10c.8-2.4 3-4.1 5.6-4.1z"/></svg>',
+  orcid:'<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="#A6CE39"/><path fill="#fff" d="M8.3 7.3a.9.9 0 1 1 0 1.8.9.9 0 0 1 0-1.8zM7.6 10h1.4v7H7.6zm3 0h3.2c3 0 4.4 2.2 4.4 3.5 0 1.5-1.2 3.5-4.4 3.5h-3.2zm1.4 1.3v4.4h1.7c2.4 0 3-1.8 3-2.2 0-.6-.4-2.2-3-2.2z"/></svg>',
+  fox:'<svg viewBox="0 0 24 24"><path fill="#E2761B" d="M20.5 3l-7 5.2 1.3-3.1z"/><path fill="#E4761B" d="M3.5 3l6.9 5.2-1.2-3.1zM18 15.5l-1.9 2.9 4 1.1 1.1-3.9zM2.8 15.6l1.1 3.9 4-1.1-1.9-2.9z"/><path fill="#E4761B" d="M7.7 10.6l-1.1 1.7 4 .2-.2-4.3zM16.3 10.6l-2.8-2.5-.1 4.4 4-.2zM7.9 18.4l2.4-1.2-2.1-1.6zM13.7 17.2l2.4 1.2-.3-2.8z"/><path fill="#F6851B" d="M10.6 12.5l-4-.2 1.6 3.3zM13.4 12.5l2.4 3.1 1.6-3.3z"/></svg>',
+  link:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"/></svg>',
+  shield:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"/><path d="M9 12l2 2 4-4"/></svg>',
+  info:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8v.01"/></svg>',
+  lock:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>',
+  check:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M5 12l5 5 9-10"/></svg>',
+  out:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M15 4h4v16h-4M10 8l-4 4 4 4M6 12h10"/></svg>',
+  arrow:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 12h14m-5-5l5 5-5 5"/></svg>',
+  star:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 3l2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1L3.2 9.5l6.1-.9z"/></svg>'
+};
+const LOGO = '<svg class="brand-mark" viewBox="0 0 64 64" aria-hidden="true"><circle cx="32" cy="32" r="31" fill="#13294B"/><circle cx="32" cy="32" r="27.2" fill="none" stroke="#C9A55A" stroke-width="1.1"/><path d="M13.5 25.5Q22.5 21.5 30.6 25.6V45.2Q22.5 41.4 13.5 45.2Z" fill="#FBF8F1"/><path d="M33.4 25.6Q41.5 21.5 50.5 25.5V45.2Q41.5 41.4 33.4 45.2Z" fill="#FBF8F1"/><path d="M17 30.2Q22.5 28 27.6 30.2M17 34.2Q22.5 32 27.6 34.2M17 38.2Q22.5 36 27.6 38.2M36.4 30.2Q41.5 28 47 30.2M36.4 34.2Q41.5 32 47 34.2" fill="none" stroke="#13294B" stroke-width="1.1" stroke-linecap="round" opacity=".55"/><path d="M42 37.2l2.2 2.2 4-4.4" fill="none" stroke="#C9A55A" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M32 10.5l4.2 5.4-4.2 5.4-4.2-5.4z" fill="#C9A55A"/></svg>';
+const WORDMARK = '<span class="brand-txt"><span class="brand-name">Peer<em>Libre</em></span><span class="brand-sub">SCHOLARLY PUBLISHING</span></span>';
+/* gold wax-style seal stamped on the provenance certificate */
+const SEAL = '<svg class="cert-seal" viewBox="0 0 80 80" aria-hidden="true"><g fill="#D7B66E"><path d="M40 2l5 6 7-3 3 7 8 0-1 8 7 4-4 7 5 6-6 5 2 8-8 2-1 8-8-1-4 7-7-4-6 5-5-6-8 1-1-8-8-2 2-8-6-5 5-6-4-7 7-4-1-8 8 0 3-7 7 3z"/></g><circle cx="40" cy="40" r="25" fill="none" stroke="#13294B" stroke-width="1.4" opacity=".5"/><path d="M29 41l7 7 15-16" fill="none" stroke="#13294B" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+
+/* ---------- seed (example records from other pilot users) ---------- */
+const EX_TEXT_1 = `1. Introduction
+Peer review depends on unpaid expert labour, and editors report rising reviewer decline rates. Whether modest payment changes review quality or timeliness remains contested (Squazzoni et al., 2013; Cotton et al., 2021).
+2. Method
+We ran a randomised field experiment in three open-access journals between March and November 2025. 1,148 review invitations were randomised to (a) no payment, (b) a USD 50 honorarium, or (c) a USD 50 donation to charity. Outcomes were acceptance of invitation, days to report, and editor-rated report quality on a validated 7-item scale (inter-rater reliability ICC = 0.78). Ethics approval was granted by the university research ethics committee (ref. 2025-117). Pre-registration: OSF.
+3. Results
+Payment increased acceptance from 41% to 49% (p = 0.004) and reduced median turnaround by 3.1 days. Report quality did not differ significantly between arms. Effects were larger for early-career reviewers.
+4. Discussion
+Modest payment improves speed and participation without measurable quality loss. Limitations include three journals in two disciplines and editor raters who were not fully blinded to arm.
+Data availability: anonymised data and code are on OSF.`;
+const EX_TEXT_2 = `We describe a pilot in which a regional computing conference accepted test-token registration through a smart-contract escrow. 212 participants registered; 64 used the token route. We report usability (SUS mean 71.4), failed transactions (3.1%) and organiser reconciliation time. Interviews were not conducted; survey data only. The contract code is public on GitHub. Limitations: single event, self-selected token users, testnet only.`;
+
+function exReport(scores, overall, tier, rec, summary, strengths, concerns, qs, exp, integ){
+  const keys = AI_CRITERIA.map(c=>c[0]); const sc={}; keys.forEach((k,i)=>sc[k]=scores[i]);
+  return {scores:sc, overall, tier_estimate:tier, recommendation:rec, confidence:.7, summary, strengths, concerns, questions_for_authors:qs, suggested_reviewer_expertise:exp, integrity_notes:integ, source:"example", at:now()-9*DAY};
+}
+
+async function seedState(user){
+  const t0 = now();
+  S = {v:1, user, credits:0, reputation:{validated:0, attestations:[]}, pools:{reviewer:0,editorial:0,tech:0,waiver:0,treasury:0},
+       manuscripts:[], ledger:[], tx:[], block:6128440, redemptions:[], seq:140};
+  const mk = async (o) => {
+    const salt = rid(16);
+    const hash = await saltedHash(o.text||o.abstract, salt);
+    const ms = Object.assign({example:true, versions:[{v:1, hash, salt, at:o.createdAt, fileName:"manuscript-v1.pdf", size:Math.round(180000+Math.random()*900000)}], reviews:[], escrow:60, slots:SLOTS}, o);
+    S.manuscripts.push(ms);
+    SPLIT.forEach(s=>S.pools[s.k]+=s.amt);
+    return ms;
+  };
+  const a = await mk({id:"PL-2026-0131", journalId:"jori", type:"Research article", authorId:"ext-1", authorName:"Author hidden (blinded)",
+    title:"Do Paid Reviews Change Reviewer Behaviour? Evidence from a Field Experiment in Three Open-Access Journals",
+    abstract:"We randomised 1,148 review invitations across three open-access journals to no payment, a USD 50 honorarium, or a charity donation. Payment raised acceptance by 8 percentage points and shortened turnaround by three days, with no detectable change in editor-rated report quality.",
+    keywords:["peer review","incentives","field experiment","open access"], text:EX_TEXT_1, createdAt:t0-12*DAY, status:"in_review",
+    ai:exReport([9,7.5,8,7.5,7,8,8.5],79,"Q1","send_to_review","Well-designed randomised field experiment directly in scope. Pre-registration, ethics approval and open data strengthen it. The main question is generalisability beyond three journals.",
+      ["Randomised design with pre-registration","Directly addresses a live policy question in peer review","Open data and code"],
+      ["Only three journals in two disciplines","Quality raters not fully blinded to treatment arm","Charity arm is under-discussed"],
+      ["How were the three journals selected?","Can rater blinding be strengthened in a robustness check?"],["meta-research","field experiments","peer review policy"],[]),
+    editorDecision:{action:"send_to_review", agreesWithAI:true, note:"Agree with AI screening. Invite two reviewers.", at:t0-11*DAY, by:"Handling editor E-04"}});
+  const b = await mk({id:"PL-2026-0136", journalId:"dis", type:"Short communication", authorId:"ext-2", authorName:"Author hidden (blinded)",
+    title:"Smart-Contract Escrow for Conference Registration: A Testnet Pilot at a Regional Computing Conference",
+    abstract:"A regional computing conference offered test-token registration through a smart-contract escrow. We report adoption (64 of 212 registrants), usability (SUS 71.4), failed transactions and organiser reconciliation time, and discuss what would be needed for a production deployment.",
+    keywords:["blockchain","conferences","smart contracts","usability"], text:EX_TEXT_2, createdAt:t0-20*DAY, status:"in_review",
+    ai:exReport([8.5,6,5.5,6,5,7.5,6.5],64,"Q2","send_to_review","In scope and practically useful, but a small single-event pilot. Suitable for a short communication if limitations are stated plainly.",
+      ["Real deployment rather than a simulation","Public contract code"],["Self-selected token users bias the usability figures","No comparison with the card-payment route","Thin literature review"],
+      ["How did token users differ from card users?","What did reconciliation cost per registrant?"],["blockchain applications","HCI / usability","event management"],["Survey consent procedure is not described."]),
+    editorDecision:{action:"send_to_review", agreesWithAI:true, note:"Send to review as a short communication.", at:t0-19*DAY, by:"Handling editor E-02"}});
+  b.reviews.push({id:"rv-"+rid(3), reviewerId:"ext-r17", alias:"Reviewer R-17", status:"submitted", acceptedAt:t0-18*DAY, dueAt:t0-4*DAY, submittedAt:t0-6*DAY,
+    recommendation:"major",
+    form:{contribution:"A useful, concrete pilot. The novelty is the real-world deployment rather than the escrow design itself, which follows standard patterns. The paper should say this directly.",
+      method:"Usability is measured only for the 64 token users, who self-selected. Without the same SUS instrument for card users, the 71.4 figure cannot be read as better or worse than the status quo. Please add the comparison or reframe the claim.",
+      evidence:"Failed-transaction rate (3.1%) needs a breakdown by cause: wallet errors, gas, or contract reverts. Table 2 should report the denominators.",
+      clarity:"Generally clear. Figure 1 sequence diagram is hard to read; consider splitting it into two figures.",
+      ethics:"The consent procedure for the survey is not described. Please add the ethics approval reference or the exemption basis.",
+      revisions:"1) Add comparison group or reframe usability claims. 2) Break down failures by cause. 3) Add consent and ethics statement. 4) Expand related work on token-based event payments."},
+    coach:{completeness:88, specificity:"high", suggested_Q:1.12, tone_flags:[], suggestions:["Consider suggesting a specific comparison metric for card users."], rationale:"Covers every section with specific, actionable points.", source:"example"}});
+  await mk({id:"PL-2026-0118", journalId:"acr", type:"Research article", authorId:"ext-3", authorName:"T. Okafor, R. Lindqvist",
+    title:"Benchmarking Retrieval-Augmented Language Models for Citation Screening in Systematic Reviews",
+    abstract:"We compare five retrieval-augmented models against human screeners on 14 published systematic reviews. The best model reaches 0.94 recall at 41% workload reduction. Code and benchmark are public.",
+    keywords:["machine learning","systematic reviews","benchmark"], createdAt:t0-60*DAY, status:"published", publishedAt:t0-3*DAY, cid:"bafybeih"+rid(12),
+    ai:exReport([9,7,8,8.5,7.5,8,8],80,"Q1","send_to_review","Strong benchmark with public code.",["Public benchmark"],["Domain coverage"],["Licence of benchmark?"],["NLP","evidence synthesis"],[]),
+    editorDecision:{action:"send_to_review", agreesWithAI:true, note:"", at:t0-58*DAY, by:"Handling editor E-01"}, finalDecision:{action:"accept", at:t0-5*DAY}});
+  await mk({id:"PL-2026-0139", journalId:"dis", type:"Perspective", authorId:"ext-4", authorName:"Author hidden (blinded)",
+    title:"Why Blockchain Will Permanently Solve the Reproducibility Crisis",
+    abstract:"Blockchain makes all research immutable and therefore reproducible. We argue that journals should require every dataset to be stored on chain.",
+    keywords:["blockchain","reproducibility"], createdAt:t0-8*DAY, status:"desk_rejected",
+    ai:exReport([6,3,1.5,1,2,5,3],31,"Below indexing standard","desk_reject","Opinion piece that conflates immutability with reproducibility and offers no evidence. Recommends on-chain storage of datasets, which conflicts with privacy and cost constraints.",
+      ["Topical"],["Core claim is a category error: immutability does not make a result reproducible","No evidence or engagement with the reproducibility literature","Proposal ignores privacy, cost and data protection law"],["What evidence links immutability to reproducibility?"],["research integrity"],["Overclaiming in title."]),
+    editorDecision:{action:"desk_reject", agreesWithAI:true, note:"Agree. Out of standard for a perspective; author advised to engage with the literature.", at:t0-7*DAY, by:"Handling editor E-02"}, escrow:0});
+  // escrow return for desk-rejected example
+  S.pools.reviewer -= 60;
+  // reserved escrow for the active review on b
+  // ledger history for examples
+  for(const ms of S.manuscripts){
+    await chain("SubmissionProof", ms.id, {versionHash:ms.versions[0].hash, v:1});
+    await chain("FeeEscrowed", ms.id, {amount:FEE});
+    await chain("AIScreeningLogged", ms.id, {overall:ms.ai.overall, rec:ms.ai.recommendation, reportHash:await sha256(JSON.stringify(ms.ai))});
+    await chain("EditorDecision", ms.id, {action:ms.editorDecision.action, agreesWithAI:ms.editorDecision.agreesWithAI});
+  }
+  await chain("ReviewerAssigned", b.id, {reviewer:"R-17", reserved:BASE_REWARD});
+  await chain("ReviewSubmitted", b.id, {reviewer:"R-17", reportHash:await sha256(JSON.stringify(b.reviews[0].form))});
+  await chain("Published", "PL-2026-0118", {cid:S.manuscripts[2].cid});
+  S.ledger.forEach((e,i)=>{ e.at = t0 - (i+1)*DAY*0.7; });
+  // the user
+  await chain("AccountLinked", null, {method:user.method, wallet:user.wallet, embedded:user.method!=="wallet"});
+  credit(WELCOME, "Welcome test credits (tPLIB, no monetary value)");
+  await chain("CreditsIssued", null, {to:user.wallet, amount:WELCOME});
+  save();
+}
+
+/* ---------- small render helpers ---------- */
+const STATUS = {
+  screening:{t:"AI Editor screening", c:"ai"}, editor_check:{t:"Awaiting editor", c:"accent"}, in_review:{t:"In peer review", c:"seal"},
+  revision_requested:{t:"Revision requested", c:"warn"}, revised:{t:"Revised, awaiting decision", c:"accent"},
+  published:{t:"Published", c:"ok"}, desk_rejected:{t:"Desk rejected", c:"bad"}, rejected:{t:"Rejected", c:"bad"}, pre_revise:{t:"Revise before review", c:"warn"}
+};
+const REC = {send_to_review:{t:"Send to peer review", c:"ok"}, revise_before_review:{t:"Revise before review", c:"warn"}, desk_reject:{t:"Desk reject", c:"bad"}};
+const RECO = {accept:"Accept", minor:"Minor revision", major:"Major revision", reject:"Reject"};
+const pill = (t,c="") => `<span class="pill ${c}"><span class="dot"></span>${esc(t)}</span>`;
+const statusPill = s => pill((STATUS[s]||{t:s}).t, (STATUS[s]||{}).c);
+const journal = id => JOURNALS.find(j=>j.id===id);
+const msById = id => S.manuscripts.find(m=>m.id===id);
+const role = () => S.user.activeRole;
+const isMine = ms => ms.authorId===S.user.id;
+const openSlots = ms => ms.slots - ms.reviews.filter(r=>r.status!=="withdrawn").length;
+
+function pipeline(ms){
+  const stages = [["Submitted","screening"],["AI screened","editor_check"],["Editor check","editor_check"],["Peer review","in_review"],["Decision","revision_requested"],["Published","published"]];
+  const order = {screening:0, editor_check:2, pre_revise:2, in_review:3, revision_requested:4, revised:4, published:6, desk_rejected:2, rejected:4};
+  const pos = order[ms.status] ?? 0, stop = ["desk_rejected","rejected"].includes(ms.status);
+  return `<div class="pipe" aria-label="Workflow progress">${stages.map((s,i)=>{
+    let cls = i<pos ? "done" : i===pos ? (stop?"stop":"now") : "";
+    if(ms.status==="published") cls="done";
+    if(stop && i>pos) cls="";
+    return `<div class="st ${cls}"><div class="bar"></div><span>${s[0]}</span></div>`;}).join("")}</div>`;
+}
+
+function scoreRing(v,label="of 100"){ return `<div class="score-ring" style="--p:${v}"><div><div><b class="num">${v}</b><span>${label}</span></div></div></div>`; }
+
+function aiReportCard(ms, opts={}){
+  const r = ms.ai, j = journal(ms.journalId);
+  if(!r){
+    if(UI.aiBusy[ms.id]!==undefined) return aiThinking(ms);
+    return `<div class="card ai-card"><div class="ai-head"><div class="ai-badge">${I.ai}</div><div><h3>AI Editor</h3><p class="muted small">No screening yet.</p></div></div></div>`;
+  }
+  const rec = REC[r.recommendation];
+  const src = r.source==="claude" ? pill("Assessed by Claude","ai") : r.source==="example" ? pill("Example record","") : pill("Rule-based fallback","warn");
+  const pass = r.overall >= j.threshold;
+  return `<div class="card ai-card stack">
+    <div class="spread"><div class="ai-head"><div class="ai-badge">${I.ai}</div><div><h3>AI Editor assessment</h3><p class="muted small">${esc(j.short)} quality bar · ${esc(j.tier)} · threshold ${j.threshold}</p></div></div>${src}</div>
+    <div class="row" style="gap:20px;align-items:center">
+      ${scoreRing(r.overall)}
+      <div class="stack" style="gap:6px;flex:1;min-width:200px">
+        <div class="row"><span class="eyebrow">Estimated tier</span><b>${esc(r.tier_estimate)}</b></div>
+        <div class="verdict ${rec.c}">${I.ai.replace('<svg','<svg width="18" height="18"')}<span>AI recommends: ${rec.t}</span></div>
+        <p class="small muted">Confidence ${Math.round(r.confidence*100)}% · ${pass?"Above":"Below"} the journal threshold</p>
+      </div>
+    </div>
+    <p>${esc(r.summary)}</p>
+    <div class="bars">${AI_CRITERIA.map(([k,l])=>{const v=r.scores[k]; return `<div class="b"><span>${l}</span><div class="track"><div class="fill ${v<5?"low":""}" style="width:${v*10}%"></div></div><span class="num mono">${fmt(v)}</span></div>`}).join("")}</div>
+    ${opts.compact?"":`<div class="grid2">
+      <div class="stack" style="gap:6px"><span class="eyebrow">Strengths</span><ul class="clean small">${r.strengths.map(s=>`<li>${esc(s)}</li>`).join("")}</ul></div>
+      <div class="stack" style="gap:6px"><span class="eyebrow">Concerns</span><ul class="clean small">${r.concerns.map(s=>`<li>${esc(s)}</li>`).join("")}</ul></div>
+      <div class="stack" style="gap:6px"><span class="eyebrow">Questions for the authors</span><ul class="clean small">${r.questions_for_authors.map(s=>`<li>${esc(s)}</li>`).join("")}</ul></div>
+      <div class="stack" style="gap:6px"><span class="eyebrow">Suggested reviewer expertise</span><div class="row">${r.suggested_reviewer_expertise.map(s=>`<span class="tag">${esc(s)}</span>`).join("")}</div>
+        ${r.integrity_notes.length?`<span class="eyebrow" style="margin-top:8px">Integrity notes</span><ul class="clean small">${r.integrity_notes.map(s=>`<li>${esc(s)}</li>`).join("")}</ul>`:""}</div>
+    </div>`}
+    <div class="callout ai">${I.info}<span>The AI Editor advises. A human editor makes the decision, and both the AI recommendation and the editor's choice are logged as separate verifiable events.</span></div>
+  </div>`;
+}
+const THINK = ["Reading title, abstract and keywords","Checking fit with the journal scope","Assessing method and evidence against the quality bar","Looking for ethics and integrity signals","Writing the brief for the handling editor"];
+function aiThinking(ms){
+  const k = UI.aiBusy[ms.id]||0;
+  return `<div class="card ai-card stack" id="think-${ms.id}"><div class="ai-head"><div class="ai-badge">${I.ai}</div><div><h3>AI Editor is reading your manuscript</h3><p class="muted small">${esc(journal(ms.journalId).name)}</p></div></div>
+  <div class="thinking">${THINK.map((t,i)=>`<div class="ln ${i<k?"done":i===k?"on":""}">${i<k?`<svg class="tick" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M5 12l5 5 9-10"/></svg>`:i===k?'<span class="spin"></span>':'<span style="width:14px"></span>'}${t}</div>`).join("")}</div></div>`;
+}
+
+function splitBar(scale=1){
+  return `<div class="split">${SPLIT.map(s=>`<div style="flex:${s.amt};background:${s.color}" title="${esc(s.label)}">${s.amt*scale>=10?s.amt*scale:""}</div>`).join("")}</div>
+  <div class="legend">${SPLIT.map(s=>`<div><i style="background:${s.color}"></i><span><b class="num">${s.amt}</b> ${esc(s.label)}</span></div>`).join("")}</div>`;
+}
+
+function evRow(e, withMs=true){
+  const info = EVENT_INFO[e.type]||{c:"accent",label:e.type};
+  const d = e.data||{};
+  const parts=[];
+  if(d.versionHash) parts.push(`fingerprint <span class="hash">${short(d.versionHash)}</span>`);
+  if(d.amount!==undefined) parts.push(`${fmt(d.amount)} tPLIB`);
+  if(d.reserved) parts.push(`${d.reserved} tPLIB reserved`);
+  if(d.R!==undefined) parts.push(`R = ${fmt(d.R)} tPLIB`);
+  if(d.overall!==undefined) parts.push(`score ${d.overall}, ${REC[d.rec]?REC[d.rec].t.toLowerCase():d.rec}`);
+  if(d.action) parts.push(`${esc(d.action.replace(/_/g," "))}${d.agreesWithAI===false?" · overrode AI":d.agreesWithAI?" · agreed with AI":""}`);
+  if(d.reviewer) parts.push(`reviewer ${esc(d.reviewer)}`);
+  if(d.cid) parts.push(`IPFS <span class="hash">${short(d.cid)}</span>`);
+  if(d.item) parts.push(esc(d.item));
+  if(d.method) parts.push(`${esc(d.method)} sign-in${d.embedded?", embedded wallet":""}`);
+  return {info, parts:parts.join(" · ")};
+}
+
+/* ---------- AUTH ---------- */
+const CERT_STEPS = ["Submitted","AI screened","Reviewed","Validated","Published"];
+function viewAuth(){
+  const o = UI.otp;
+  const live = p => AUTH.live(p) ? '<span class="live-chip">Live</span>' : '<span class="live-chip demo">Demo</span>';
+  return `<div class="auth">
+  <section class="auth-hero">
+    <canvas id="guilloche" aria-hidden="true"></canvas>
+    <div class="hero-brand">${LOGO.replace('class="brand-mark"','class="brand-mark" style="width:54px;height:54px"')}${WORDMARK}</div>
+    <div class="stack" style="gap:16px">
+      <span class="eyebrow">Proof-of-concept · Pilot 2026</span>
+      <h1>Publish transparently.<br><em>Review fairly.</em></h1>
+      <p class="lead">An editorial office where an AI Editor gives every manuscript a careful first reading, editors keep the final word, reviewers are rewarded once their reports are validated, and each step carries a verifiable proof.</p>
+    </div>
+    <div class="cert" id="cert" aria-label="Example provenance record">
+      ${SEAL}
+      <div class="cert-head"><span>Certificate of provenance</span><span class="mono" style="letter-spacing:0">PL-2026-0118</span></div>
+      <div class="cert-title">Benchmarking Retrieval-Augmented Language Models for Citation Screening in Systematic Reviews</div>
+      <div class="cert-steps">${CERT_STEPS.map(s=>`<div><i></i><span>${s}</span></div>`).join("")}</div>
+      <div class="cert-hash" id="cert-hash">0x4c9af0005fb7c05b7129b67368c1fa6dda45bd46fb5f64198eb2a11fb4b0f5e1</div>
+    </div>
+  </section>
+  <section class="auth-panel"><div class="auth-card">
+    <div class="stack" style="gap:6px"><h2>Sign in</h2><p class="muted">Use your academic account or a crypto wallet. Both open the same workspace.</p></div>
+    ${o ? `
+      <div class="card stack">
+        <div class="stack" style="gap:4px"><b>Check your inbox</b><p class="small muted">We sent a 6-digit code to ${esc(o.email)}.</p></div>
+        <div class="otp" id="otp">${[0,1,2,3,4,5].map(i=>`<input class="input" id="otp${i}" inputmode="numeric" maxlength="1" aria-label="Digit ${i+1}">`).join("")}</div>
+        <div class="demo-note">Prototype: no email is sent. Your code is <b class="mono" style="font-size:1rem">${o.code}</b></div>
+        <button class="btn primary block" data-act="verifyOtp">Verify and continue</button>
+        <button class="btn ghost block" data-act="cancelOtp">Use a different method</button>
+      </div>` : `
+    <div class="stack" style="gap:8px">
+      <span class="eyebrow">Academic account</span>
+      <div class="provider-row">
+        <button class="login-opt" data-act="google"><span class="ic">${I.google}</span><span class="tx"><b>Google</b><span>Any Google account</span></span>${live("google")}</button>
+        <button class="login-opt" data-act="orcid"><span class="ic">${I.orcid}</span><span class="tx"><b>ORCID</b><span>Researcher iD</span></span>${live("orcid")}</button>
+      </div>
+      <div class="row" style="flex-wrap:nowrap"><input class="input" id="email" type="email" placeholder="you@university.edu" autocomplete="email" aria-label="Email address"><button class="btn primary" data-act="sendOtp">Email me a code</button></div>
+      <p class="small muted">Google, ORCID and email accounts get a wallet created for them, so you can earn and spend credits without installing anything.</p>
+    </div>
+    <div class="or">or use a wallet</div>
+    <div class="stack" style="gap:8px">
+      <button class="login-opt" data-act="walletBrowser"><span class="ic">${I.fox}</span><span class="tx"><b>Browser wallet</b><span>MetaMask, Rabby, Coinbase Wallet. Sign a message, no gas.</span></span><span class="go">${I.arrow}</span></button>
+      <button class="login-opt" data-act="walletTest"><span class="ic" style="color:var(--accent)">${I.wallet}</span><span class="tx"><b>Create a test wallet</b><span>A Sepolia-style address for this pilot</span></span><span class="go">${I.arrow}</span></button>
+    </div>`}
+    <p class="small muted">Pilot build. Credits are tPLIB test credits with no monetary value.</p>
+  </div></section></div>`;
+}
+
+function viewOnboard(){
+  const u = UI.pendingUser, roles = u.roles;
+  const rc = (k,t,d)=>`<label class="rolecard ${roles.includes(k)?"on":""}" style="position:relative"><input type="checkbox" data-act="toggleRole" data-r="${k}" ${roles.includes(k)?"checked":""}><b>${t}</b><span>${d}</span></label>`;
+  return `<div class="auth-panel" style="min-height:100%"><div class="auth-card" style="max-width:620px">
+    <div class="row">${LOGO.replace('class="brand-mark"','class="brand-mark" style="width:40px;height:40px"')}<span class="eyebrow">Step 2 of 2 · Your scholarly profile</span></div>
+    <h2>Welcome to PeerLibre</h2>
+    <div class="card stack">
+      <div class="kv"><dt>Signed in with</dt><dd>${esc({wallet:"Browser wallet",test:"Test wallet",email:"Email",google:"Google",orcid:"ORCID"}[u.via]||u.method)}${u.email?` · ${esc(u.email)}`:""}</dd>
+      <dt>${u.method==="wallet"?"Wallet":"Embedded wallet"}</dt><dd class="hash">${esc(u.wallet)}</dd></div>
+      ${u.method!=="wallet"?`<div class="callout">${I.shield}<span>We created a wallet for you. You can link your own wallet later from Credits & wallet.</span></div>`:""}
+    </div>
+    <label class="field">Full name<input class="input" id="ob-name" value="${esc(u.name||"")}" placeholder="Dr. Jane Doe"></label>
+    ${u.method==="wallet"?`<label class="field">Email for notifications <span class="hint">Optional. Never written on chain.</span><input class="input" id="ob-email" type="email" placeholder="you@university.edu"></label>`:""}
+    <label class="field">ORCID iD <span class="hint">Optional. Used to verify reviewer expertise.</span><input class="input" id="ob-orcid" value="${esc(u.orcid||"")}" placeholder="0000-0000-0000-0000"></label>
+    <div class="stack" style="gap:8px"><span class="field" style="font-size:.86rem;font-weight:500">How will you use PeerLibre? <span class="hint">Pick any. You can switch roles at any time.</span></span>
+      <div class="rolecards">${rc("author","Author","Submit manuscripts and track every step")}${rc("reviewer","Reviewer","Review and earn credits after validation")}${rc("editor","Editor","Screen with the AI Editor, decide, validate")}</div></div>
+    <label class="field">Expertise <span class="hint">Comma separated. Used to match you with review requests.</span><input class="input" id="ob-exp" value="peer review, research integrity, blockchain"></label>
+    <label class="check"><input type="checkbox" id="ob-coi" checked><span>I will declare conflicts of interest and keep manuscripts I review confidential.</span></label>
+    <button class="btn primary block" data-act="finishOnboard">Enter PeerLibre and receive ${WELCOME} test credits</button>
+  </div></div>`;
+}
+
+/* ---------- SHELL ---------- */
+function navItems(){
+  const r = S.user.roles;
+  const mine = S.manuscripts.filter(isMine).length;
+  const pool = S.manuscripts.filter(m=>m.status==="in_review" && openSlots(m)>0 && !isMine(m)).length;
+  const desk = S.manuscripts.filter(m=>["editor_check","revised"].includes(m.status) || m.reviews.some(x=>x.status==="submitted")).length;
+  return [
+    ["dashboard","Home",I.home,null,true],
+    ["submit","Submit manuscript",I.upload,null,r.includes("author")],
+    ["mine","My manuscripts",I.doc,mine,r.includes("author")],
+    ["pool","Review pool",I.review,pool,r.includes("reviewer")],
+    ["desk","Editor desk",I.desk,desk,r.includes("editor")],
+    ["ledger","Provenance ledger",I.chain,null,true],
+    ["market","Academic services",I.market,null,true],
+    ["wallet","Credits & wallet",I.coin,null,true]
+  ].filter(x=>x[4]);
+}
+function viewShell(inner){
+  const u = S.user;
+  const roleBtns = u.roles.map(r=>`<button class="${u.activeRole===r?"on":""}" data-act="role" data-r="${r}">${r[0].toUpperCase()+r.slice(1)}</button>`).join("");
+  const cur = ["detail","reviewform"].includes(UI.view) ? (UI.from||"dashboard") : UI.view;
+  return `<div class="shell">
+  <nav class="rail" aria-label="Main">
+    <div class="brand">${LOGO}${WORDMARK}</div>
+    <div class="nav-group">${navItems().map(([k,l,ic,c])=>`${k==="ledger"?'<div class="nav-sep"></div>':""}<button class="nav-btn ${cur===k?"on":""}" data-act="go" data-v="${k}">${ic}<span>${l}</span>${c?`<span class="count">${c}</span>`:""}</button>`).join("")}</div>
+    <div class="rail-foot">
+      <div class="who"><div class="avatar">${esc(initials(u.name))}</div><div class="who-txt"><div class="n">${esc(u.name)}</div><div class="w mono">${short(u.wallet)}</div></div></div>
+      <button class="btn ghost small" data-act="logout" style="justify-content:flex-start">${I.out} Sign out</button>
+    </div>
+  </nav>
+  <main class="main">
+    <div class="topbar">
+      <div class="row"><span class="eyebrow">Working as</span><div class="role-switch" role="tablist">${roleBtns}</div></div>
+      <div class="row"><button class="btn ghost small only-phone" data-act="logout">Sign out</button><button class="balance" data-act="go" data-v="wallet" title="Your credits">${I.coin}<span class="num">${fmt(S.credits)}</span><span style="font-weight:500;opacity:.8">tPLIB</span></button></div>
+    </div>
+    ${inner}
+  </main></div>`;
+}
+
+/* ---------- DASHBOARD ---------- */
+function greet(){ const h=new Date().getHours(); return h<12?"Good morning":h<18?"Good afternoon":"Good evening"; }
+function viewDashboard(){
+  const mine = S.manuscripts.filter(isMine);
+  const myReviews = S.manuscripts.flatMap(m=>m.reviews.filter(r=>r.reviewerId===S.user.id).map(r=>({m,r})));
+  const earned = S.tx.filter(t=>t.memo.startsWith("Review reward")).reduce((a,t)=>a+t.delta,0);
+  const r = role();
+  let next = "";
+  if(r==="author"){
+    next = mine.length ? `<div class="list">${mine.slice(0,4).map(msRow).join("")}</div>` :
+      `<div class="empty"><b style="color:var(--ink)">Submit your first manuscript</b><span>The AI Editor reads it within a minute and tells you how it measures up to the journal's quality bar.</span><button class="btn primary" data-act="go" data-v="submit">${I.upload} Submit a manuscript</button></div>`;
+  } else if(r==="reviewer"){
+    const pool = S.manuscripts.filter(m=>m.status==="in_review" && openSlots(m)>0 && !isMine(m));
+    next = `<div class="list">${pool.slice(0,3).map(m=>poolRow(m,true)).join("") || `<div class="empty">No open review requests right now.</div>`}</div>`;
+  } else {
+    const q = S.manuscripts.filter(m=>["editor_check","revised"].includes(m.status) || m.reviews.some(x=>x.status==="submitted"));
+    next = q.length ? `<div class="list">${q.map(msRow).join("")}</div>` : `<div class="empty">Your desk is clear.</div>`;
+  }
+  const title = {author:"Your manuscripts", reviewer:"Review requests matched to you", editor:"Waiting on your decision"}[r];
+  const bannerTxt = {author:["Your research, on the record.","Submit a manuscript and the AI Editor gives you a first reading against the journal's standard within a minute. Every version you send is fingerprinted and timestamped.","submit","Submit a manuscript"],
+    reviewer:["Your expertise, recognised.","Reviews are matched to your expertise. Accepting reserves your reward, and it's released once an editor validates your report.","pool","Open the review pool"],
+    editor:["Your judgement, supported.","The AI Editor drafts a first assessment of each submission. You decide, and every decision is recorded next to the AI's advice.","desk","Go to the editor desk"]}[r];
+  return `<section class="banner fade-in"><canvas id="guilloche" aria-hidden="true"></canvas>
+    <div class="stack" style="gap:10px"><span class="eyebrow">${new Date().toLocaleDateString(undefined,{weekday:"long",day:"numeric",month:"long"})} · ${greet()}, ${esc(S.user.name.split(/\s+/).find(w=>!/^(dr|prof|mr|mrs|ms)\.?$/i.test(w))||S.user.name)}</span><h1>${bannerTxt[0]}</h1><p>${bannerTxt[1]}</p></div>
+    <div class="row"><button class="btn primary" data-act="go" data-v="${bannerTxt[2]}">${bannerTxt[3]} ${I.arrow}</button></div></section>
+  <div class="grid4">
+    <div class="card stat lift"><div class="k">Credits</div><div class="v">${fmt(S.credits)}<small>tPLIB</small></div></div>
+    <div class="card stat lift"><div class="k">Manuscripts submitted</div><div class="v">${mine.length}</div></div>
+    <div class="card stat lift"><div class="k">Reviews validated</div><div class="v">${S.reputation.validated}<small>${fmt(earned)} tPLIB earned</small></div></div>
+    <div class="card stat lift"><div class="k">Reviewer pool, all journals</div><div class="v">${fmt(S.pools.reviewer)}<small>tPLIB</small></div></div>
+  </div>
+  <div class="section"><div class="spread"><h2>${title}</h2>${r==="author"&&mine.length?`<button class="btn primary" data-act="go" data-v="submit">${I.upload} New submission</button>`:""}</div>${next}</div>
+  <div class="section grid2">
+    <div class="card stack"><span class="eyebrow">How it works</span><h3>Your fee funds the people who review your work</h3><p class="small muted">Every submission costs ${FEE} credits. Sixty go into the reviewer pool and are paid out only after an editor validates each report, using R = B × Q × T × C. The reviewer's recommendation never changes the reward.</p>${splitBar()}</div>
+    <div class="card stack"><div class="spread"><span class="eyebrow">Latest on the ledger</span><button class="btn ghost small" data-act="go" data-v="ledger">Open ledger ${I.arrow}</button></div>
+      <div class="chain-line">${S.ledger.slice(0,5).map(e=>{const {info,parts}=evRow(e);return `<div class="ev"><div class="node ${info.c}"></div><div class="stack" style="gap:2px;min-width:0"><b class="small">${info.label}${e.msId?` <span class="muted mono">${e.msId}</span>`:""}</b><span class="small muted">${parts}</span><span class="hash">block ${e.block.toLocaleString()} · ${short(e.tx)}</span></div></div>`}).join("")}</div></div>
+  </div>`;
+}
+function msRow(m){
+  const j = journal(m.journalId);
+  return `<div class="ms" data-act="open" data-id="${m.id}" tabindex="0" role="button">
+    <div class="stack" style="gap:6px;min-width:0"><div class="t">${esc(m.title)}</div>
+    <div class="meta"><span class="mono">${m.id}</span><span>${esc(j.short)}</span><span>${esc(m.type)}</span><span>${fdate(m.createdAt)}</span>${m.example?"<span>Example record</span>":""}</div></div>
+    <div class="stack" style="gap:6px;align-items:flex-end">${statusPill(m.status)}${m.ai?`<span class="pill ai">AI ${m.ai.overall}</span>`:""}</div></div>`;
+}
+function matchScore(m){
+  const exp = (S.user.expertise||[]).map(x=>x.toLowerCase());
+  const kws = [...(m.keywords||[]), ...((m.ai&&m.ai.suggested_reviewer_expertise)||[])].map(x=>x.toLowerCase());
+  let hit=0; exp.forEach(e=>{ if(kws.some(k=>k.includes(e)||e.includes(k)||e.split(" ").some(w=>w.length>4&&k.includes(w)))) hit++; });
+  return clamp(Math.round(45 + hit*18 + (m.journalId==="jori"?6:0)), 30, 98);
+}
+function poolRow(m, compact){
+  const j = journal(m.journalId), mine = isMine(m), ms = matchScore(m);
+  return `<div class="ms" style="cursor:default">
+    <div class="stack" style="gap:8px;min-width:0"><div class="t">${esc(m.title)}</div>
+      <div class="meta"><span class="mono">${m.id}</span><span>${esc(j.short)}</span><span>${esc(m.type)}</span><span>Author identity hidden</span></div>
+      ${compact?"":`<p class="small muted">${esc(m.abstract)}</p>`}
+      <div class="row">${m.keywords.map(k=>`<span class="tag">${esc(k)}</span>`).join("")}</div></div>
+    <div class="stack" style="gap:8px;align-items:flex-end;text-align:right">
+      <span class="pill seal">${BASE_REWARD} to ${fmt(reward(BASE_REWARD,1.2,1.1,1))} tPLIB</span>
+      <span class="pill accent">${ms}% expertise match</span>
+      <span class="small muted">${openSlots(m)} of ${m.slots} slots open · 14 days</span>
+      ${mine?`<span class="pill bad">Conflict: you are the author</span>`:`<button class="btn primary" data-act="acceptReview" data-id="${m.id}">Accept and reserve ${BASE_REWARD} tPLIB</button>`}
+    </div></div>`;
+}
+
+/* ---------- SUBMIT ---------- */
+function newDraft(){ return {journalId:"jori", type:"Research article", title:"", abstract:"", keywords:"", text:"", fileName:"", fileSize:0, fileBytes:null, decl1:false, decl2:false, decl3:false}; }
+function viewSubmit(){
+  const d = UI.draft || (UI.draft = newDraft());
+  const st = UI.step;
+  const steps = ["Manuscript","Fee & proof","AI Editor"];
+  const stepper = `<div class="stepper">${steps.map((s,i)=>`<div class="${i+1===st?"on":i+1<st?"done":""}"><b>${i+1<st?"✓":i+1}</b>${s}</div>`).join("")}</div>`;
+  const head = `<div class="page-head"><span class="eyebrow">New submission</span><h1>Submit a manuscript</h1><p>Pay ${FEE} credits, get a timestamped proof of your exact version, and an AI Editor reading in about a minute. A human editor decides what happens next.</p></div>`;
+  if(st===1){
+    const j = journal(d.journalId);
+    return head+stepper+`<div class="grid2" style="grid-template-columns:minmax(0,1.6fr) minmax(0,1fr)">
+    <div class="card stack">
+      <div class="spread"><h3>Manuscript details</h3><button class="btn ghost small" data-act="loadExample">${I.doc} Fill with an example</button></div>
+      <label class="field">Journal<select class="input" id="d-journal" data-bind="draft.journalId">${JOURNALS.map(x=>`<option value="${x.id}" ${x.id===d.journalId?"selected":""}>${esc(x.name)} (${x.tier})</option>`).join("")}</select></label>
+      <label class="field">Article type<select class="input" id="d-type" data-bind="draft.type">${["Research article","Short communication","Review article","Perspective","Software paper"].map(t=>`<option ${t===d.type?"selected":""}>${t}</option>`).join("")}</select></label>
+      <label class="field">Title<input class="input" id="d-title" data-bind="draft.title" value="${esc(d.title)}" placeholder="A clear, specific title"></label>
+      <label class="field">Abstract<textarea class="input" id="d-abstract" data-bind="draft.abstract" rows="5" placeholder="150 to 300 words">${esc(d.abstract)}</textarea></label>
+      <label class="field">Keywords <span class="hint">Comma separated</span><input class="input" id="d-kw" data-bind="draft.keywords" value="${esc(d.keywords)}" placeholder="peer review, incentives, open science"></label>
+      <div class="field" style="font-size:.86rem;font-weight:500">Manuscript file</div>
+      <label class="drop" id="drop" for="d-file">${I.upload}<b>${d.fileName?esc(d.fileName):"Drop your PDF, DOCX or TXT here"}</b><span class="small muted">${d.fileName?`${fmt(d.fileSize/1024)} KB · ${d.text?d.text.split(/\s+/).length.toLocaleString()+" words extracted for the AI Editor":"text could not be extracted; the AI Editor will use the abstract"}`:"or click to choose a file. Encrypted at rest; only its fingerprint goes on chain."}</span></label>
+      <input type="file" id="d-file" accept=".pdf,.docx,.txt,.md" hidden>
+      <details><summary class="small" style="cursor:pointer;color:var(--accent)">Or paste the main text</summary><textarea class="input" id="d-text" data-bind="draft.text" rows="6" style="margin-top:8px" placeholder="Paste the body of the manuscript">${esc(d.text)}</textarea></details>
+      <div class="row" style="justify-content:flex-end"><button class="btn primary" data-act="toStep2">Continue ${I.arrow}</button></div>
+    </div>
+    <div class="stack">
+      <div class="card stack"><span class="eyebrow">${esc(j.short)} · ${esc(j.tier)}</span><h3>${esc(j.name)}</h3><p class="small"><b>Scope.</b> ${esc(j.scope)}</p><p class="small"><b>Quality bar.</b> ${esc(j.bar)}</p><p class="small muted">The AI Editor sends papers scoring ${j.threshold} or more straight to the handling editor with a "send to review" recommendation.</p></div>
+      <div class="callout">${I.lock}<span>Your file stays encrypted off chain. The ledger only records a salted fingerprint, the version number and the time.</span></div>
+    </div></div>`;
+  }
+  if(st===2){
+    const enough = S.credits >= FEE;
+    return head+stepper+`<div class="grid2" style="grid-template-columns:minmax(0,1.4fr) minmax(0,1fr)">
+    <div class="card stack">
+      <h3>Pay the submission fee</h3>
+      <div class="spread"><span>Submission fee</span><b class="num" style="font-family:var(--f-display);font-size:1.5rem">${FEE} tPLIB</b></div>
+      <div class="spread small muted"><span>Your balance after payment</span><span class="num">${fmt(S.credits-FEE)} tPLIB</span></div>
+      ${splitBar()}
+      <div class="callout seal">${I.coin}<span>If the editor desk-rejects your paper, the ${SPLIT[0].amt} credits reserved for reviewers come back to you. Unused reviewer reserves return to the pool.</span></div>
+      <div class="divider"></div>
+      <label class="check"><input type="checkbox" id="decl1" data-bind="draft.decl1" ${d.decl1?"checked":""}><span>This is original work and is not under review elsewhere.</span></label>
+      <label class="check"><input type="checkbox" id="decl2" data-bind="draft.decl2" ${d.decl2?"checked":""}><span>I agree that an AI Editor gives an advisory first assessment, which is shared with me and the handling editor.</span></label>
+      <label class="check"><input type="checkbox" id="decl3" data-bind="draft.decl3" ${d.decl3?"checked":""}><span>All authors approved this submission and conflicts of interest are declared.</span></label>
+      ${enough?"":`<div class="callout warn">${I.info}<span>You need ${fmt(FEE-S.credits)} more credits. Apply for a waiver or add sponsored credits from Credits & wallet.</span></div>`}
+      <div class="spread"><button class="btn ghost" data-act="step" data-s="1">Back</button>
+        ${enough?`<button class="btn seal" data-act="pay">${I.coin} Pay ${FEE} tPLIB and submit</button>`:`<button class="btn primary" data-act="getCredits">${I.coin} Get credits</button>`}</div>
+    </div>
+    <div class="card stack"><span class="eyebrow">What goes on chain</span>
+      <div class="kv small"><dt>Recorded</dt><dd>Salted SHA-256 fingerprint, manuscript ID, version, time, fee split, AI screening summary score, editor decisions, reward releases</dd>
+      <dt>Never recorded</dt><dd>Manuscript text, review reports, reviewer identities, personal data</dd></div>
+      <div class="divider"></div>
+      <span class="eyebrow">Your submission</span>
+      <p style="font-family:var(--f-display);font-size:1.1rem">${esc(d.title)}</p>
+      <p class="small muted">${esc(journal(d.journalId).name)} · ${esc(d.type)}${d.fileName?` · ${esc(d.fileName)}`:""}</p>
+    </div></div>`;
+  }
+  // step 3
+  const ms = msById(UI.sel);
+  return head+stepper+`<div class="grid2" style="grid-template-columns:minmax(0,1.6fr) minmax(0,1fr)">
+    <div>${aiReportCard(ms)}</div>
+    <div class="stack">
+      <div class="card stack"><span class="eyebrow">Submission recorded</span><h3 class="mono" style="font-family:var(--f-mono);font-size:1rem">${ms.id}</h3>
+        <div class="kv small"><dt>Fingerprint</dt><dd class="hash">${ms.versions[0].hash}</dd><dt>Time</dt><dd>${ftime(ms.versions[0].at)}</dd><dt>Paid</dt><dd>${FEE} tPLIB, split into five pools</dd></div></div>
+      ${ms.ai?`<div class="card stack"><span class="eyebrow">What happens next</span><p class="small">The handling editor reads the AI assessment and decides whether to send your paper to reviewers. You'll see their decision and reason here.</p><button class="btn primary" data-act="open" data-id="${ms.id}">Open manuscript ${I.arrow}</button></div>`:""}
+    </div></div>`;
+}
+
+/* ---------- MANUSCRIPT DETAIL ---------- */
+function viewDetail(){
+  const ms = msById(UI.sel); if(!ms) return `<div class="empty">Manuscript not found.</div>`;
+  const j = journal(ms.journalId), r = role(), mine = isMine(ms);
+  const evs = S.ledger.filter(e=>e.msId===ms.id).slice().reverse();
+  const canSeeReviews = r==="editor" || (mine && true);
+  const reviews = ms.reviews.filter(rv => r==="editor" || rv.reviewerId===S.user.id || (mine && rv.status==="validated"));
+  return `<button class="btn ghost small" data-act="go" data-v="${UI.from||"dashboard"}" style="margin-bottom:10px">← Back</button>
+  <div class="page-head" style="max-width:900px"><div class="row"><span class="mono muted">${ms.id}</span>${statusPill(ms.status)}${ms.example?pill("Example record"):""}${mine?pill("You are the author","accent"):""}</div>
+    <h1>${esc(ms.title)}</h1><p>${esc(j.name)} · ${esc(ms.type)} · submitted ${fdate(ms.createdAt)}</p></div>
+  <div class="card" style="margin-bottom:18px">${pipeline(ms)}</div>
+  <div class="grid2" style="grid-template-columns:minmax(0,1.6fr) minmax(0,1fr);align-items:start">
+    <div class="stack" style="gap:16px">
+      ${editorPanel(ms)}
+      ${authorPanel(ms)}
+      ${aiReportCard(ms)}
+      <div class="card stack"><span class="eyebrow">Abstract</span><p>${esc(ms.abstract)}</p><div class="row">${ms.keywords.map(k=>`<span class="tag">${esc(k)}</span>`).join("")}</div></div>
+      ${reviews.length||canSeeReviews?`<div class="stack"><h2>Reviews</h2>${reviews.length?reviews.map(rv=>reviewCard(ms,rv)).join(""):`<div class="empty">${ms.status==="in_review"?(mine?"Validated reviews appear here once the editor approves them.":"No reviews yet."):"No reviews for this manuscript."}</div>`}</div>`:""}
+    </div>
+    <div class="stack" style="gap:16px">
+      ${ms.editorDecision?`<div class="card stack"><span class="eyebrow">Editor's screening decision</span><b>${esc(REC[ms.editorDecision.action]?REC[ms.editorDecision.action].t:ms.editorDecision.action)}</b>
+        ${ms.editorDecision.agreesWithAI?pill("Agreed with AI Editor","ok"):pill("Overrode AI Editor","warn")}
+        ${ms.editorDecision.note?`<p class="small">“${esc(ms.editorDecision.note)}”</p>`:""}<p class="small muted">${esc(ms.editorDecision.by||"Handling editor")} · ${ftime(ms.editorDecision.at)}</p></div>`:""}
+      ${ms.finalDecision?`<div class="card stack"><span class="eyebrow">Decision</span><b>${esc(RECO[ms.finalDecision.action]||ms.finalDecision.action)}</b>${ms.finalDecision.note?`<p class="small">“${esc(ms.finalDecision.note)}”</p>`:""}${ms.cid?`<div class="kv small"><dt>Public copy</dt><dd class="hash">ipfs://${ms.cid}</dd></div>`:""}</div>`:""}
+      <div class="card stack"><span class="eyebrow">Reviewer reward escrow</span>
+        <div class="spread"><span class="small">Unreserved for this paper</span><b class="num">${fmt(ms.escrow)} tPLIB</b></div>
+        <div class="spread"><span class="small">Reserved for reviewers</span><b class="num">${fmt(ms.reviews.filter(x=>["accepted","submitted"].includes(x.status)).length*BASE_REWARD)} tPLIB</b></div>
+        <div class="spread"><span class="small">Released after validation</span><b class="num">${fmt(ms.reviews.filter(x=>x.status==="validated").reduce((a,x)=>a+(x.reward||0),0))} tPLIB</b></div></div>
+      <div class="card stack"><span class="eyebrow">Versions</span>${ms.versions.map(v=>`<div class="stack" style="gap:2px"><b class="small">Version ${v.v} · ${esc(v.fileName)}</b><span class="hash">${v.hash}</span><span class="small muted">${ftime(v.at)}</span></div>`).join("")}
+        ${mine?`<p class="small muted">Your private salt for v${ms.versions.length}: <span class="mono">${ms.versions[ms.versions.length-1].salt.slice(0,12)}…</span> Keep it to prove this exact version later.</p>`:""}</div>
+      <div class="card stack"><span class="eyebrow">Provenance trail</span><div class="chain-line">${evs.map(e=>{const {info,parts}=evRow(e);return `<div class="ev"><div class="node ${info.c}"></div><div class="stack" style="gap:2px;min-width:0"><b class="small">${info.label}</b><span class="small muted">${parts}</span><span class="hash">#${e.block.toLocaleString()} · ${short(e.tx)} · ${ftime(e.at)}</span></div></div>`}).join("")}</div></div>
+    </div>
+  </div>`;
+}
+
+function editorPanel(ms){
+  if(role()!=="editor") return "";
+  const ai = ms.ai; const mine = isMine(ms);
+  const coi = mine?`<div class="callout warn">${I.info}<span>You are the author of this paper. In a live journal it would be routed to another editor. The prototype lets you continue so you can try the full workflow.</span></div>`:"";
+  if(["editor_check","pre_revise"].includes(ms.status) && ai){
+    const pick = UI.edPick && UI.edPick.id===ms.id ? UI.edPick.a : null;
+    const agrees = pick ? pick===ai.recommendation : null;
+    return `<div class="card raised stack" style="border-color:var(--accent)"><div class="spread"><h3>Your screening decision</h3>${pill("Handling editor","accent")}</div>${coi}
+      <p class="small">The AI Editor recommends <b>${REC[ai.recommendation].t.toLowerCase()}</b> with a score of ${ai.overall}. You decide.</p>
+      <div class="row">${Object.entries(REC).map(([k,v])=>`<button class="btn ${pick===k?"primary":""}" data-act="edPick" data-id="${ms.id}" data-a="${k}">${v.t}</button>`).join("")}</div>
+      ${pick?`${agrees?pill("Agrees with the AI Editor","ok"):pill("Overrides the AI Editor, a reason is required","warn")}
+      <label class="field">Note to author ${agrees?'<span class="hint">Optional</span>':'<span class="hint">Required when overriding. Logged for the human-AI agreement record.</span>'}<textarea class="input" id="ed-note" rows="3" placeholder="${pick==="send_to_review"?"Brief instructions for reviewers or the author":"Reason for your decision"}"></textarea></label>
+      <div class="row" style="justify-content:flex-end"><button class="btn primary" data-act="edDecide" data-id="${ms.id}">Record decision</button></div>`:""}
+    </div>`;
+  }
+  if(ms.status==="in_review"){
+    const subs = ms.reviews.filter(x=>x.status==="submitted");
+    const val = ms.reviews.filter(x=>x.status==="validated").length;
+    const open = openSlots(ms);
+    return `<div class="card raised stack" style="border-color:var(--accent)"><div class="spread"><h3>Peer review in progress</h3>${pill(`${val} of ${ms.slots} reviews validated`,"accent")}</div>${coi}
+      ${subs.length?`<p class="small">${subs.length} report${subs.length>1?"s":""} waiting for your validation below.</p>`:""}
+      ${open>0?`<div class="callout">${I.review}<span>${open} reviewer slot${open>1?"s are":" is"} open in the review pool. ${mine?"Because you are the author you can't review it yourself; ":""}For the demo you can invite a simulated pilot reviewer.</span></div><div><button class="btn" data-act="simReviewer" data-id="${ms.id}">Invite a simulated reviewer</button></div>`:""}
+      ${val>=1 && !subs.length && ms.reviews.every(x=>x.status!=="accepted") ? finalDecisionBlock(ms):""}
+    </div>`;
+  }
+  if(ms.status==="revised") return `<div class="card raised stack" style="border-color:var(--accent)"><h3>Revised version received</h3>${coi}<p class="small">Version ${ms.versions.length} was submitted with a new fingerprint. Make the final decision.</p>${finalDecisionBlock(ms,true)}</div>`;
+  return "";
+}
+function finalDecisionBlock(ms, revised){
+  const opts = revised ? ["accept","reject"] : ["accept","minor","major","reject"];
+  return `<div class="stack"><span class="eyebrow">Editorial decision</span><div class="row">${opts.map(o=>`<button class="btn ${o==="accept"?"primary":o==="reject"?"danger":""}" data-act="final" data-id="${ms.id}" data-a="${o}">${RECO[o]}</button>`).join("")}</div>
+    <label class="field">Decision letter<textarea class="input" id="final-note" rows="2" placeholder="Summary for the author"></textarea></label></div>`;
+}
+function authorPanel(ms){
+  if(!isMine(ms) || role()!=="author") return "";
+  if(ms.status==="revision_requested" || ms.status==="pre_revise"){
+    return `<div class="card raised stack" style="border-color:var(--warn)"><h3>Upload your revised manuscript</h3><p class="small">The revision gets its own fingerprint and version record. ${ms.status==="pre_revise"?"It goes back to the editor before review.":"It goes back to the editor for a decision."}</p>
+      <label class="drop" for="rev-file">${I.upload}<b>${UI.revFile&&UI.revFile.id===ms.id?esc(UI.revFile.name):"Choose revised file"}</b><span class="small muted">PDF, DOCX or TXT</span></label><input type="file" id="rev-file" data-id="${ms.id}" hidden>
+      <label class="field">Response to reviewers<textarea class="input" id="rev-note" rows="3" placeholder="How you addressed each point"></textarea></label>
+      <div class="row" style="justify-content:flex-end"><button class="btn primary" data-act="submitRevision" data-id="${ms.id}">Submit revision</button></div></div>`;
+  }
+  if(ms.status==="editor_check") return `<div class="callout">${I.info}<span>Waiting for the handling editor. ${S.user.roles.includes("editor")?"Switch to Editor at the top to try the editor's side.":""}</span></div>`;
+  return "";
+}
+
+function reviewCard(ms, rv){
+  const r = role(), f = rv.form||{};
+  const isEd = r==="editor";
+  const flags = rv.status!=="accepted" ? integrityFlags(ms, rv) : [];
+  const recPill = rv.recommendation ? pill(RECO[rv.recommendation],"") : "";
+  let body = "";
+  if(rv.status==="accepted") body = `<p class="small muted">Accepted ${ftime(rv.acceptedAt)} · due ${fdate(rv.dueAt)} · ${BASE_REWARD} tPLIB reserved</p>${rv.reviewerId===S.user.id?`<div><button class="btn primary" data-act="writeReview" data-id="${ms.id}">Write review</button></div>`:""}`;
+  else body = `<div class="stack small">${[["contribution","Contribution & originality"],["method","Methodological quality"],["evidence","Evidence & results"],["clarity","Clarity"],["ethics","Ethics"],["revisions","Required revisions"]].map(([k,l])=>f[k]?`<div><b>${l}.</b> ${esc(f[k])}</div>`:"").join("")}${isEd&&f.confidential?`<div class="callout">${I.lock}<span><b>Confidential to editor.</b> ${esc(f.confidential)}</span></div>`:""}</div>`;
+  let validate = "";
+  if(isEd && rv.status==="submitted"){
+    const q = (UI.qv[rv.id] ?? (rv.coach?rv.coach.suggested_Q:1)), T = timeliness(rv), C = UI.cv[rv.id]===false?0:1, R = reward(BASE_REWARD,q,T,C);
+    validate = `<div class="divider"></div><div class="stack">
+      <div class="spread"><h3>Validate and release reward</h3>${rv.coach?pill(`Quality check ${rv.coach.completeness}% complete`,"ai"):""}</div>
+      ${rv.coach?`<div class="callout ai">${I.ai}<span>${esc(rv.coach.rationale||"")} Suggested Q = ${fmt(rv.coach.suggested_Q)}. The quality check never looks at the recommendation.</span></div>`:""}
+      ${flags.length?`<div class="callout warn">${I.info}<span><b>Flags for your attention.</b> ${flags.map(esc).join(" ")} Flags inform your judgement; they are not findings of misconduct.</span></div>`:""}
+      <div class="slider-row"><span>Quality Q</span><input type="range" min="0.8" max="1.2" step="0.01" value="${q}" data-act="qv" data-id="${rv.id}" id="q-${rv.id}" aria-label="Quality factor"><b class="num mono">${fmt(q)}</b></div>
+      <div class="slider-row"><span>Timeliness T</span><span class="small muted">${Math.round((rv.submittedAt-rv.acceptedAt)/DAY*10)/10} of 14 days used</span><b class="num mono">${fmt(T)}</b></div>
+      <label class="check"><input type="checkbox" id="c-${rv.id}" data-act="cv" data-id="${rv.id}" ${C?"checked":""}><span>Integrity C: no confidentiality breach or undeclared conflict</span></label>
+      <div class="formula">R = ${BASE_REWARD} × ${fmt(q)} × ${fmt(T)} × ${C} = <b>${fmt(R)} tPLIB</b></div>
+      <div class="row" style="justify-content:flex-end"><button class="btn" data-act="returnReview" data-id="${ms.id}" data-r="${rv.id}">Return for improvement</button><button class="btn seal" data-act="validate" data-id="${ms.id}" data-r="${rv.id}">${I.check} Validate and release</button></div>
+    </div>`;
+  }
+  return `<div class="card stack"><div class="spread"><div class="row"><b>${esc(rv.reviewerId===S.user.id?"Your review":rv.alias)}</b>${recPill}</div>
+    ${rv.status==="validated"?pill(`Validated · ${fmt(rv.reward)} tPLIB released`,"ok"):rv.status==="submitted"?pill("Awaiting validation","seal"):pill("In progress","")}</div>
+    ${body}${validate}</div>`;
+}
+
+/* ---------- REVIEW POOL & FORM ---------- */
+function viewPool(){
+  const mineRv = S.manuscripts.flatMap(m=>m.reviews.filter(r=>r.reviewerId===S.user.id).map(r=>({m,r})));
+  const pool = S.manuscripts.filter(m=>m.status==="in_review" && openSlots(m)>0 && !m.reviews.some(r=>r.reviewerId===S.user.id))
+    .sort((a,b)=>matchScore(b)-matchScore(a));
+  return `<div class="page-head"><span class="eyebrow">Reviewer</span><h1>Review pool</h1><p>Open review requests, sorted by how well they match your expertise. Author identities are hidden. Accepting reserves the base reward in escrow; it's released after an editor validates your report.</p></div>
+  <div class="card stack" style="margin-bottom:18px"><div class="spread"><span class="eyebrow">Your reward</span><span class="small muted">Recommendation has no effect on payment</span></div>
+    <div class="formula">R = B × Q × T × C</div>
+    <div class="grid3 small"><div><b>B</b> base reward: ${BASE_REWARD} tPLIB</div><div><b>Q</b> report quality: 0.80 to 1.20</div><div><b>T</b> timeliness: 0.90 to 1.10</div><div><b>C</b> integrity: 1, or 0 for a serious breach</div></div></div>
+  ${mineRv.length?`<div class="section" style="margin-top:0"><h2>Your assignments</h2><div class="list">${mineRv.map(({m,r})=>`<div class="ms" data-act="${r.status==="accepted"?"writeReview":"open"}" data-id="${m.id}" role="button" tabindex="0"><div class="stack" style="gap:6px;min-width:0"><div class="t">${esc(m.title)}</div><div class="meta"><span class="mono">${m.id}</span><span>${r.status==="accepted"?"Due "+fdate(r.dueAt):"Submitted "+fdate(r.submittedAt)}</span></div></div><div>${r.status==="validated"?pill(`${fmt(r.reward)} tPLIB earned`,"ok"):r.status==="submitted"?pill("Awaiting validation","seal"):pill("Write review","accent")}</div></div>`).join("")}</div></div>`:""}
+  <div class="section"><h2>Open requests</h2><div class="list">${pool.map(m=>poolRow(m,false)).join("") || `<div class="empty">No open requests right now. Check back later.</div>`}</div></div>`;
+}
+function viewReviewForm(){
+  const ms = msById(UI.sel), rv = ms.reviews.find(r=>r.reviewerId===S.user.id);
+  const f = UI.rform[ms.id] || (UI.rform[ms.id] = {contribution:"",method:"",evidence:"",clarity:"",ethics:"",revisions:"",confidential:"",recommendation:""});
+  const c = UI.coach[ms.id];
+  const fld = (k,l,h) => `<label class="field">${l} <span class="hint">${h}</span><textarea class="input" id="rf-${k}" data-bind="rform.${ms.id}.${k}" rows="3">${esc(f[k])}</textarea></label>`;
+  return `<button class="btn ghost small" data-act="go" data-v="pool" style="margin-bottom:10px">← Review pool</button>
+  <div class="page-head" style="max-width:900px"><div class="row"><span class="mono muted">${ms.id}</span>${pill("Due "+fdate(rv.dueAt),"seal")}${pill(BASE_REWARD+" tPLIB reserved","seal")}</div><h1>${esc(ms.title)}</h1><p>${esc(journal(ms.journalId).name)} · author identity hidden</p></div>
+  <div class="grid2" style="grid-template-columns:minmax(0,1.5fr) minmax(0,1fr);align-items:start">
+    <div class="card stack">
+      <h3>Structured review</h3>
+      ${fld("contribution","Contribution & originality","What does the paper add? Is it new?")}
+      ${fld("method","Methodological quality","Design, sample, analysis, validity")}
+      ${fld("evidence","Evidence & results","Do the results support the claims?")}
+      ${fld("clarity","Clarity & presentation","Structure, figures, writing")}
+      ${fld("ethics","Ethical issues","Approval, consent, data protection, conflicts")}
+      ${fld("revisions","Required revisions","Numbered, actionable list")}
+      <label class="field">Recommendation <span class="hint">Shared with the editor. It never affects your reward.</span><select class="input" id="rf-rec" data-bind="rform.${ms.id}.recommendation"><option value="">Choose</option>${Object.entries(RECO).map(([k,v])=>`<option value="${k}" ${f.recommendation===k?"selected":""}>${v}</option>`).join("")}</select></label>
+      ${fld("confidential","Confidential note to the editor","Optional. Never shown to authors.")}
+      <div class="row" style="justify-content:flex-end"><button class="btn ai" data-act="coach" data-id="${ms.id}" ${UI.coachBusy?"disabled":""}>${UI.coachBusy?'<span class="spin" style="border-top-color:var(--surface)"></span> Checking':I.ai+" Check my report"}</button><button class="btn primary" data-act="submitReview" data-id="${ms.id}">Submit review</button></div>
+    </div>
+    <div class="stack" style="gap:16px">
+      <div class="card ai-card stack"><div class="ai-head"><div class="ai-badge">${I.ai}</div><div><h3>Review Quality Assistant</h3><p class="small muted">Checks completeness and tone before you submit</p></div></div>
+        ${c?`<div class="row" style="gap:16px">${scoreRing(c.completeness,"complete")}<div class="stack" style="gap:4px"><span class="small">Specificity: <b>${esc(c.specificity)}</b></span><span class="small">Likely quality factor: <b class="mono">Q ≈ ${fmt(c.suggested_Q)}</b></span>${c.source==="claude"?pill("Checked by Claude","ai"):pill("Rule-based check","warn")}</div></div>
+          <div class="row">${Object.entries(c.sections||{}).map(([k,v])=>`<span class="pill ${v==="strong"?"ok":v==="adequate"?"accent":v==="thin"?"warn":"bad"}">${esc(k)}: ${esc(v)}</span>`).join("")}</div>
+          ${c.suggestions.length?`<ul class="clean small">${c.suggestions.map(s=>`<li>${esc(s)}</li>`).join("")}</ul>`:""}
+          ${c.tone_flags.length?`<div class="callout warn">${I.info}<span>${c.tone_flags.map(esc).join(" ")}</span></div>`:""}`
+        :`<p class="small muted">Write your report, then run a check. The assistant looks at coverage, specificity and tone. It never sees or weighs your recommendation, so it can't nudge you toward accept or reject.</p>`}
+      </div>
+      <div class="card stack"><span class="eyebrow">Abstract</span><p class="small">${esc(ms.abstract)}</p></div>
+      ${ms.ai?`<div class="card stack"><span class="eyebrow">Questions the AI Editor raised</span><ul class="clean small">${ms.ai.questions_for_authors.map(q=>`<li>${esc(q)}</li>`).join("")}</ul><p class="small muted">Use these as prompts if helpful. Your judgement is independent.</p></div>`:""}
+      <div class="callout">${I.lock}<span>Your report is stored encrypted. Only its fingerprint and the validation event go on the ledger, and payouts are batched so your identity can't be linked to this paper.</span></div>
+    </div>
+  </div>`;
+}
+
+/* ---------- EDITOR DESK ---------- */
+function viewDesk(){
+  const screen = S.manuscripts.filter(m=>m.status==="editor_check"||m.status==="revised");
+  const validate = S.manuscripts.filter(m=>m.reviews.some(r=>r.status==="submitted"));
+  const inrev = S.manuscripts.filter(m=>m.status==="in_review" && !validate.includes(m));
+  const decided = S.manuscripts.filter(m=>m.editorDecision && m.ai);
+  const agree = decided.filter(m=>m.editorDecision.agreesWithAI).length;
+  const overrides = decided.filter(m=>!m.editorDecision.agreesWithAI);
+  const block = (t, list, empty) => `<div class="section"><h2>${t} <span class="muted" style="font-size:1rem">${list.length}</span></h2>${list.length?`<div class="list">${list.map(msRow).join("")}</div>`:`<div class="empty">${empty}</div>`}</div>`;
+  return `<div class="page-head"><span class="eyebrow">Editor</span><h1>Editor desk</h1><p>The AI Editor screens each submission first. You make every decision, validate reviews before rewards are released, and each choice is logged next to the AI's recommendation.</p></div>
+  <div class="grid3">
+    <div class="card stat"><div class="k">Needs a screening decision</div><div class="v">${screen.length}</div></div>
+    <div class="card stat"><div class="k">Reviews to validate</div><div class="v">${validate.reduce((a,m)=>a+m.reviews.filter(r=>r.status==="submitted").length,0)}</div></div>
+    <div class="card stat ai-card"><div class="k">Human–AI agreement</div><div class="v">${decided.length?Math.round(agree/decided.length*100):0}%<small>${agree} of ${decided.length} decisions</small></div></div>
+  </div>
+  ${block("Screening decisions", screen, "No new submissions waiting.")}
+  ${block("Reviews awaiting validation", validate, "No reports to validate.")}
+  ${block("Under review", inrev, "Nothing under review.")}
+  <div class="section"><h2>Override log</h2><p class="muted small" style="max-width:640px">Every time an editor disagrees with the AI Editor the reason is kept. This is the evidence base for auditing the AI and for research on trust in AI-assisted editorial decisions.</p>
+    ${overrides.length?`<div class="tbl-wrap"><table class="ledger"><thead><tr><th>Manuscript</th><th>AI</th><th>Editor</th><th>Reason</th></tr></thead><tbody>${overrides.map(m=>`<tr><td class="mono">${m.id}</td><td>${REC[m.ai.recommendation].t} (${m.ai.overall})</td><td>${REC[m.editorDecision.action].t}</td><td>${esc(m.editorDecision.note)}</td></tr>`).join("")}</tbody></table></div>`:`<div class="empty">No overrides yet. Try disagreeing with the AI Editor on a submission.</div>`}
+  </div>`;
+}
+
+/* ---------- LEDGER ---------- */
+function viewLedger(){
+  const types = ["all", ...new Set(S.ledger.map(e=>e.type))];
+  const rows = S.ledger.filter(e=>UI.filter==="all"||e.type===UI.filter);
+  return `<div class="page-head"><span class="eyebrow">Provenance</span><h1>Provenance ledger</h1><p>Every workflow event as it would be anchored on a public test network. Only fingerprints and event metadata are recorded; manuscripts and reports stay encrypted off chain.</p></div>
+  <div class="grid2" style="margin-bottom:18px">
+    <div class="card stack"><span class="eyebrow">Verify a document</span><p class="small">Check whether a file matches a recorded version. Authors share their private salt to prove which version they submitted and when.</p>
+      <label class="field">Salt <span class="hint">From the author's version receipt</span><input class="input mono" id="vf-salt" placeholder="e.g. 9f3a…"></label>
+      <label class="drop" for="vf-file" style="padding:14px">${I.shield}<b>Choose a file to verify</b></label><input type="file" id="vf-file" hidden>
+      <div id="vf-out"></div></div>
+    <div class="card stack"><span class="eyebrow">Network</span><div class="kv small"><dt>Network</dt><dd>Simulated testnet (Sepolia-style), per browser</dd><dt>Latest block</dt><dd class="mono">${S.block.toLocaleString()}</dd><dt>Events</dt><dd>${S.ledger.length}</dd><dt>Contracts</dt><dd>Submission Registry · Reward Escrow · tPLIB Token · Reputation Attestation</dd></div>
+      <div class="callout">${I.info}<span>The next build swaps this simulation for real contracts on Sepolia or Polygon Amoy without changing the screens.</span></div></div>
+  </div>
+  <div class="row" style="margin-bottom:10px"><label class="field" style="flex-direction:row;align-items:center;gap:8px">Show<select class="input" id="lg-filter" data-act="filter" style="width:auto">${types.map(t=>`<option value="${t}" ${UI.filter===t?"selected":""}>${t==="all"?"All events":(EVENT_INFO[t]||{label:t}).label}</option>`).join("")}</select></label></div>
+  <div class="tbl-wrap"><table class="ledger"><thead><tr><th>Block</th><th>Event</th><th>Manuscript</th><th>Details</th><th>Tx</th><th>Time</th></tr></thead><tbody>
+  ${rows.map(e=>{const {info,parts}=evRow(e);return `<tr><td class="mono num">${e.block.toLocaleString()}</td><td><span class="pill ${info.c==="accent"?"accent":info.c}">${info.label}</span></td><td class="mono">${e.msId?`<a href="#" data-act="open" data-id="${e.msId}">${e.msId}</a>`:"—"}</td><td class="small">${parts}</td><td class="hash">${short(e.tx)}</td><td class="small muted" style="white-space:nowrap">${ftime(e.at)}</td></tr>`}).join("")}
+  </tbody></table></div>`;
+}
+
+/* ---------- MARKET ---------- */
+function viewMarket(){
+  return `<div class="page-head"><span class="eyebrow">Utility</span><h1>Academic services</h1><p>Spend credits you earned from validated reviews on conferences, training, software and books from pilot partners, or give them to authors who can't afford the fee.</p></div>
+  <div class="grid3">${MARKET.map(m=>{const got=S.redemptions.filter(r=>r.id===m.id).length; return `<div class="card stack item"><div class="kind spread"><span class="pill ${m.kind==="Waiver"?"ok":"accent"}">${m.kind}</span>${got?pill(`Redeemed ×${got}`,"ok"):""}</div>
+    <h3>${esc(m.title)}</h3><p class="small muted">${esc(m.partner)}</p><div class="spread" style="margin-top:auto"><span class="price num">${m.price} <span class="small muted" style="font-family:var(--f-body)">tPLIB</span></span>
+    <button class="btn ${S.credits>=m.price?"seal":""}" data-act="redeem" data-id="${m.id}" ${S.credits>=m.price?"":"disabled"}>${m.kind==="Waiver"?"Donate":"Redeem"}</button></div></div>`}).join("")}</div>
+  <div class="callout" style="margin-top:18px">${I.info}<span>Partners are placeholders for the pilot. Test credits have no cash value and can't be sold or exchanged.</span></div>`;
+}
+
+/* ---------- WALLET ---------- */
+function viewWallet(){
+  const u = S.user;
+  return `<div class="page-head"><span class="eyebrow">Account</span><h1>Credits & wallet</h1></div>
+  <div class="grid2">
+    <div class="card stack"><span class="eyebrow">Balance</span><div class="stat"><div class="v" style="font-size:2.8rem;color:var(--seal)">${fmt(S.credits)}<small>tPLIB</small></div></div>
+      <div class="kv small"><dt>Sign-in</dt><dd>${esc({wallet:"Browser wallet",test:"Test wallet",email:"Email",google:"Google",orcid:"ORCID"}[u.via]||u.method)}${u.email?` · ${esc(u.email)}`:""}</dd><dt>${u.method==="wallet"?"Wallet":"Embedded wallet"}</dt><dd class="hash">${esc(u.wallet)}</dd>${u.orcid?`<dt>ORCID</dt><dd class="mono">${esc(u.orcid)}</dd>`:""}</div>
+      <div class="row">${u.method!=="wallet"?`<button class="btn" data-act="linkWallet">${I.link} Link my own wallet</button>`:""}</div></div>
+    <div class="card stack"><span class="eyebrow">Get credits</span>
+      <p class="small">Buy credits by card or invoice, use a sponsor code from your institution, or ask for a waiver. You never need to buy crypto.</p>
+      <div class="grid2" style="gap:8px">${[["card","Buy by card"],["sponsor","Sponsor code"],["waiver","Request a waiver"],["usdc","Pay with USDC"]].map(([k,l])=>`<button class="btn" data-act="getCredits" data-tab="${k}">${l}</button>`).join("")}</div>
+      <button class="btn ghost small" data-act="faucet" style="align-self:flex-start">Test faucet +100</button></div>
+  </div>
+  <div class="section grid2">
+    <div class="card stack"><span class="eyebrow">Platform pools</span>${SPLIT.map(s=>`<div class="spread small"><span class="row" style="gap:8px"><i style="width:10px;height:10px;border-radius:3px;background:${s.color};display:inline-block"></i>${esc(s.label)}</span><b class="num">${fmt(S.pools[s.k])}</b></div>`).join("")}</div>
+    <div class="card stack"><span class="eyebrow">Reputation</span><p class="small muted">Non-transferable attestations for validated reviews. Kept separate from credits: you can't buy reputation.</p>
+      ${S.reputation.attestations.length?S.reputation.attestations.map(a=>`<div class="spread small"><span>${I.star.replace('<svg','<svg width="14" height="14"')} Validated review · ${a.journal}</span><span class="muted">${fdate(a.at)}</span></div>`).join(""):`<div class="empty" style="padding:16px">Your first validated review earns your first attestation.</div>`}</div>
+  </div>
+  <div class="section"><h2>Transactions</h2><div class="tbl-wrap"><table class="ledger"><thead><tr><th>Date</th><th>Description</th><th style="text-align:right">Amount</th><th style="text-align:right">Balance</th></tr></thead><tbody>
+    ${S.tx.map(t=>`<tr><td class="small muted" style="white-space:nowrap">${ftime(t.at)}</td><td>${esc(t.memo)}${t.msId?` <span class="mono muted">${t.msId}</span>`:""}</td><td class="num" style="text-align:right;color:${t.delta>=0?"var(--ok)":"var(--bad)"}">${t.delta>=0?"+":""}${fmt(t.delta)}</td><td class="num" style="text-align:right">${fmt(t.bal)}</td></tr>`).join("")}
+  </tbody></table></div></div>`;
+}
+
+/* ---------- GET CREDITS (sheet) ---------- */
+const CREDIT_PRICE = 1;           // example: 1 credit = USD 1. Set your own price.
+const PACKS = [{n:100, off:0, note:"One submission"},{n:300, off:.05, note:"Three submissions"},{n:1000, off:.1, note:"Lab or group"}];
+const packPrice = p => Math.round(p.n*CREDIT_PRICE*(1-p.off)*100)/100;
+function viewGetCredits(){
+  const g = UI.gc; const need = Math.max(0, FEE - S.credits);
+  const tabs = [["card","Card"],["sponsor","Sponsor code"],["waiver","Waiver"],["usdc","USDC"],["invoice","Invoice"]];
+  let body = "";
+  if(g.stage==="done"){
+    body = `<div class="stack" style="align-items:center;text-align:center;padding:12px 0">${SEAL.replace('class="cert-seal"','style="width:72px;height:72px"')}
+      <h3>${esc(g.doneTitle)}</h3><p class="small muted">${g.doneText}</p>
+      <div class="kv small" style="text-align:left"><dt>New balance</dt><dd class="num"><b>${fmt(S.credits)} tPLIB</b></dd>${g.receipt?`<dt>Receipt</dt><dd class="mono">${g.receipt}</dd>`:""}</div>
+      <button class="btn primary" data-act="gcClose">${UI.view==="submit"?"Back to my submission":"Done"}</button></div>`;
+  } else if(g.tab==="card"){
+    const p = PACKS[g.pack];
+    body = `<div class="stack">
+      <div class="grid3" style="gap:8px">${PACKS.map((x,i)=>`<button class="rolecard ${i===g.pack?"on":""}" data-act="gcPack" data-i="${i}" style="text-align:left"><b class="num">${x.n} credits</b><span>${x.note}</span><span class="num" style="color:var(--ink);font-weight:600">USD ${fmt(packPrice(x))}${x.off?` <span class="pill ok">${x.off*100}% off</span>`:""}</span></button>`).join("")}</div>
+      <p class="small muted">Example pricing (1 credit = USD ${CREDIT_PRICE}). You set the real price.</p>
+      <div class="card stack" style="background:var(--surface-2)">
+        <div class="spread"><b class="small">Card details</b><span class="pill">Secure checkout by Stripe · demo</span></div>
+        <label class="field">Card number<input class="input mono" id="cc-num" inputmode="numeric" value="4242 4242 4242 4242"></label>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px"><label class="field">Expiry<input class="input mono" id="cc-exp" value="12 / 29"></label><label class="field">CVC<input class="input mono" id="cc-cvc" value="123"></label></div>
+        <label class="field">Name on card<input class="input" id="cc-name" value="${esc(S.user.name)}"></label>
+      </div>
+      <button class="btn seal block" data-act="gcPayCard" ${g.busy?"disabled":""}>${g.busy?'<span class="spin"></span> Processing':`Pay USD ${fmt(packPrice(p))} and add ${p.n} credits`}</button>
+      <p class="small muted">Demo only: no card is charged. In the live app Stripe takes the payment and a server webhook adds the credits.</p></div>`;
+  } else if(g.tab==="sponsor"){
+    body = `<div class="stack"><p class="small">Universities, societies and funders buy credits in bulk and give their researchers a code.</p>
+      <div class="row" style="flex-wrap:nowrap"><input class="input mono" id="sp-code" placeholder="e.g. AIT-PILOT"><button class="btn primary" data-act="sponsor">Apply code</button></div>
+      <p class="small muted">Try AIT-PILOT (200 credits, once per account).</p></div>`;
+  } else if(g.tab==="waiver"){
+    body = `<div class="stack"><p class="small">The researcher inclusion pool receives 10 credits from every submission and covers fees for authors without funding. It holds <b class="num">${fmt(S.pools.waiver)}</b> credits right now.</p>
+      <label class="field">Reason<select class="input" id="wv-reason"><option>No research funding for publication</option><option>Early-career researcher</option><option>Researcher in a lower-income country</option><option>Other</option></select></label>
+      <label class="field">Anything the editor should know <span class="hint">Optional</span><textarea class="input" id="wv-note" rows="2"></textarea></label>
+      <button class="btn primary" data-act="waiver">Request ${Math.min(FEE, Math.floor(S.pools.waiver))} credits</button>
+      <p class="small muted">In the live app an editor approves each request. The demo approves it straight away.</p></div>`;
+  } else if(g.tab==="usdc"){
+    const p = PACKS[g.pack];
+    body = `<div class="stack"><p class="small">For people who already hold crypto. You pay in USDC and receive ordinary credits, not a token.</p>
+      <div class="grid3" style="gap:8px">${PACKS.map((x,i)=>`<button class="rolecard ${i===g.pack?"on":""}" data-act="gcPack" data-i="${i}" style="text-align:left"><b class="num">${x.n} credits</b><span class="num" style="color:var(--ink);font-weight:600">${fmt(packPrice(x))} USDC</span></button>`).join("")}</div>
+      <div class="kv small"><dt>Pay from</dt><dd class="hash">${esc(S.user.wallet)}</dd><dt>Network</dt><dd>Polygon (demo)</dd></div>
+      <button class="btn seal block" data-act="gcPayUsdc" ${g.busy?"disabled":""}>${g.busy?'<span class="spin"></span> Waiting for confirmation':`Pay ${fmt(packPrice(p))} USDC`}</button>
+      <p class="small muted">Demo only: no funds move. In the live app a crypto payment processor confirms the transfer, then credits are added.</p></div>`;
+  } else {
+    body = `<div class="stack"><p class="small">For universities and funders paying by invoice or purchase order. Credits go to an institutional account, and staff claim them with a code or their university email.</p>
+      <label class="field">Institution<input class="input" id="iv-inst" placeholder="Asian Institute of Technology"></label>
+      <label class="field">Billing email<input class="input" id="iv-email" type="email" placeholder="finance@university.edu"></label>
+      <label class="field">Credits<select class="input" id="iv-n"><option>1000</option><option>5000</option><option>20000</option></select></label>
+      <button class="btn primary" data-act="gcInvoice">Request invoice</button></div>`;
+  }
+  return `<div class="spread"><div class="row">${I.coin.replace('<svg','<svg width="22" height="22" style="color:var(--seal)"')}<h3>Get credits</h3></div><button class="btn ghost small" data-act="closeModal" aria-label="Close">✕</button></div>
+    ${g.stage!=="done"?`<div class="spread small"><span>Balance <b class="num">${fmt(S.credits)}</b> tPLIB</span>${need?`<span class="pill warn">${fmt(need)} more needed to submit</span>`:""}</div>
+    <div class="tabs" style="flex-wrap:wrap">${tabs.map(([k,l])=>`<button class="${g.tab===k?"on":""}" data-act="gcTab" data-tab="${k}" style="white-space:nowrap">${l}</button>`).join("")}</div>`:""}
+    ${body}`;
+}
+
+/* ---------- render ---------- */
+Object.assign(UI, {qv:{}, cv:{}, rform:{}, edPick:null, revFile:null, coachBusy:false});
+const app = () => document.getElementById("app");
+function render(){
+  let html;
+  if(!S || !S.user){ html = UI.pendingUser ? viewOnboard() : viewAuth(); }
+  else {
+    const v = {dashboard:viewDashboard, submit:viewSubmit, mine:viewMine, pool:viewPool, desk:viewDesk, ledger:viewLedger, market:viewMarket, wallet:viewWallet, detail:viewDetail, reviewform:viewReviewForm}[UI.view] || viewDashboard;
+    html = viewShell(v());
+  }
+  app().innerHTML = html;
+  stopArt(); startArt();
+}
+function viewMine(){
+  const mine = S.manuscripts.filter(isMine);
+  return `<div class="page-head"><span class="eyebrow">Author</span><h1>My manuscripts</h1><p>Every version, decision and payment for your work, with its proof.</p></div>
+  ${mine.length?`<div class="list">${mine.map(msRow).join("")}</div>`:`<div class="empty"><b style="color:var(--ink)">No manuscripts yet</b><button class="btn primary" data-act="go" data-v="submit">${I.upload} Submit a manuscript</button></div>`}
+  <div class="section"><h2>Published in the pilot journals</h2><div class="list">${S.manuscripts.filter(m=>m.status==="published"&&!isMine(m)).map(msRow).join("")}</div></div>`;
+}
+function go(v){ if(!["detail","reviewform"].includes(v)) UI.from = v; UI.view = v; render(); window.scrollTo(0,0); }
+
+/* ---------- toasts ---------- */
+function toast(msg){
+  let box = document.querySelector(".toasts"); if(!box){ box=document.createElement("div"); box.className="toasts"; document.body.appendChild(box); }
+  const t = document.createElement("div"); t.className="toast"; t.innerHTML = `<span>${msg}</span>`; box.appendChild(t);
+  setTimeout(()=>t.remove(), 4000); while(box.children.length>3) box.firstChild.remove();
+}
+function burst(text, el){
+  const r = el ? el.getBoundingClientRect() : {left:innerWidth/2, top:innerHeight/2, width:0};
+  const b = document.createElement("div"); b.className="coin-burst"; b.textContent=text;
+  b.style.left=(r.left+r.width/2-30)+"px"; b.style.top=(r.top-10)+"px"; document.body.appendChild(b); setTimeout(()=>b.remove(),1300);
+}
+
+/* ---------- auth ---------- */
+const randAddr = () => "0x"+rid(20);
+function startOnboard(p){ UI.pendingUser = Object.assign({roles:["author","reviewer","editor"]}, p); UI.otp=null; render(); }
+async function walletBrowser(){
+  const eth = window.ethereum;
+  if(!eth){ modal(`<h3>No browser wallet found here</h3><p class="small muted">This preview runs inside a sandboxed frame, where wallet extensions such as MetaMask usually can't connect. On the deployed site the same button opens your wallet and asks you to sign a sign-in message (no gas, no transaction).</p><div class="row" style="justify-content:flex-end"><button class="btn ghost" data-act="closeModal">Cancel</button><button class="btn primary" data-act="walletTest">Use a test wallet instead</button></div>`); return; }
+  try{
+    const [addr] = await eth.request({method:"eth_requestAccounts"});
+    const nonce = rid(8);
+    const msg = `peerlibre.com wants you to sign in with your Ethereum account:\n${addr}\n\nSign in to PeerLibre. This request will not trigger a blockchain transaction or cost any gas.\n\nNonce: ${nonce}\nIssued At: ${new Date().toISOString()}`;
+    await eth.request({method:"personal_sign", params:[msg, addr]});
+    startOnboard({method:"wallet", via:"wallet", wallet:addr});
+  }catch(e){ toast("Wallet sign-in was cancelled."); }
+}
+function sendOtp(){
+  const email = ($("#email").value||"").trim();
+  if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)){ toast("Enter a valid email address."); $("#email").focus(); return; }
+  UI.otp = {email, code:String(Math.floor(100000+Math.random()*900000))}; render();
+  setTimeout(()=>{ const f=$("#otp0"); f&&f.focus(); },30);
+}
+function verifyOtp(){
+  const code = [0,1,2,3,4,5].map(i=>$("#otp"+i).value).join("");
+  if(code!==UI.otp.code){ toast("That code doesn't match. Check the digits and try again."); return; }
+  const email = UI.otp.email;
+  startOnboard({method:"email", via:"email", email, wallet:randAddr(), name:""});
+}
+async function finishOnboard(){
+  const u = UI.pendingUser;
+  const name = ($("#ob-name").value||"").trim();
+  if(!name){ toast("Add your name so editors and co-authors recognise you."); $("#ob-name").focus(); return; }
+  if(!u.roles.length){ toast("Choose at least one role."); return; }
+  if(!$("#ob-coi").checked){ toast("Please confirm the confidentiality and conflict-of-interest statement."); return; }
+  const user = {id:"u-"+rid(4), name, email:u.email || ($("#ob-email")&&$("#ob-email").value.trim()) || "", wallet:u.wallet, method:u.method, via:u.via, orcid:($("#ob-orcid").value||"").trim(),
+    roles:u.roles, activeRole:u.roles[0], expertise:($("#ob-exp").value||"").split(",").map(s=>s.trim()).filter(Boolean), joined:now()};
+  UI.pendingUser = null;
+  app().innerHTML = `<div class="auth-panel" style="min-height:100%"><div class="stack" style="align-items:center"><span class="spin" style="width:28px;height:28px"></span><p class="muted">Setting up your account</p></div></div>`;
+  await seedState(user);
+  UI.view="dashboard"; UI.from="dashboard"; render();
+  toast(`Welcome, ${esc(name)}. <span class="mono">+${WELCOME} tPLIB</span> test credits added.`);
+}
+
+/* ---------- modal ---------- */
+function modal(html){ closeModal(); const s=document.createElement("div"); s.className="scrim"; s.id="scrim"; s.innerHTML=`<div class="modal" role="dialog" aria-modal="true">${html}</div>`; document.body.appendChild(s);
+  s.addEventListener("click",e=>{ if(e.target===s) closeModal(); }); }
+function closeModal(){ const s=$("#scrim"); s&&s.remove(); }
+
+/* ---------- file reading ---------- */
+function loadScript(src){ return new Promise((res,rej)=>{ if(document.querySelector(`script[src="${src}"]`)) return res(); const s=document.createElement("script"); s.src=src; s.onload=res; s.onerror=rej; document.head.appendChild(s); }); }
+async function extractText(file, bytes){
+  const n = file.name.toLowerCase();
+  try{
+    if(n.endsWith(".txt")||n.endsWith(".md")) return new TextDecoder().decode(bytes);
+    if(n.endsWith(".pdf")){
+      await loadScript("https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js");
+      await loadScript("https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js");
+      const lib = window.pdfjsLib; lib.GlobalWorkerOptions.workerSrc = "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
+      const pdf = await lib.getDocument({data:bytes.slice(0), disableWorker:true, isEvalSupported:false}).promise;
+      let out=""; for(let p=1;p<=Math.min(pdf.numPages,25);p++){ const pg=await pdf.getPage(p); const tc=await pg.getTextContent(); out+=tc.items.map(i=>i.str).join(" ")+"\n"; }
+      return out;
+    }
+    if(n.endsWith(".docx")){
+      await loadScript("https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js");
+      const r = await window.mammoth.extractRawText({arrayBuffer:bytes.slice(0)}); return r.value;
+    }
+  }catch(e){ console.warn(e); }
+  return "";
+}
+async function onDraftFile(file){
+  if(!file) return;
+  const d = UI.draft; const bytes = await file.arrayBuffer();
+  d.fileName=file.name; d.fileSize=file.size; d.fileBytes=bytes;
+  toast("Reading "+esc(file.name)+"…");
+  const text = await extractText(file, bytes);
+  if(text.trim()){ d.text = text.slice(0,60000);
+    if(!d.title){ const first = text.trim().split("\n").find(l=>l.trim().length>12); if(first) d.title = first.trim().slice(0,200); } }
+  render();
+}
+
+/* ---------- submission ---------- */
+const EXAMPLE_SUB = {journalId:"jori", type:"Research article",
+  title:"AI-Assisted Desk Screening and Editor Trust: A Vignette Experiment with Journal Editors in Thailand and the UK",
+  abstract:"Journals increasingly use AI tools to screen submissions, yet little is known about whether editors and authors see AI-assisted decisions as fair. We report a pre-registered factorial vignette experiment with 412 academics in Thailand and the United Kingdom. Participants evaluated desk decisions that varied by decision maker (human, AI-assisted human, automated AI), outcome (accept for review or reject), explanation (none or itemised) and the presence of a verifiable audit trail. AI-assisted decisions with itemised explanations were rated as fair as human decisions, while fully automated rejections were rated markedly less fair (d = 0.61). A visible audit trail raised trust in rejections by 0.4 scale points. We discuss implications for responsible AI adoption in editorial workflows.",
+  keywords:"peer review, AI in publishing, organisational justice, trust, research integrity",
+  text:`1. Introduction\nEditorial offices face rising submission volumes. AI screening tools promise faster desk decisions, but their legitimacy depends on whether researchers perceive them as procedurally fair (Colquitt, 2001) and whether they trust the technology (McKnight et al., 2011).\n2. Method\nWe pre-registered a 3x2x2x2 between-subjects vignette experiment on OSF. 412 academics (Thailand n = 198; UK n = 214) were recruited from corresponding authors in OpenAlex. Measures: procedural and informational justice (Colquitt 2001, alpha = .89), trust in technology (alpha = .91). Ethics approval: institutional review board, ref. RI-2026-031. Analyses used OLS with robust standard errors and multi-group comparisons by country.\n3. Results\nAutomated AI rejections were rated less fair than human rejections (d = 0.61, p < .001). Itemised explanations closed most of the gap for AI-assisted decisions. Audit trails increased trust in rejections (b = 0.40, 95% CI 0.22 to 0.58). Country differences were small.\n4. Discussion\nResults support AI as an assistant rather than a decision maker, and suggest transparency mechanisms such as verifiable logs can raise legitimacy. Limitations: hypothetical vignettes, self-selected respondents.\nData availability: data and code on OSF.`};
+
+async function pay(btn){
+  const d = UI.draft;
+  if(!(d.decl1&&d.decl2&&d.decl3)){ toast("Please confirm all three declarations."); return; }
+  if(S.credits < FEE){ toast("Not enough credits."); return; }
+  btn.disabled = true; btn.innerHTML = '<span class="spin"></span> Recording proof';
+  S.seq += 1;
+  const id = "PL-2026-0"+S.seq;
+  const salt = rid(16);
+  const hash = await saltedHash(d.fileBytes || (d.title+"\n"+d.abstract+"\n"+d.text), salt);
+  const ms = {id, journalId:d.journalId, type:d.type, authorId:S.user.id, authorName:S.user.name, title:d.title.trim(), abstract:d.abstract.trim(),
+    keywords:d.keywords.split(",").map(s=>s.trim()).filter(Boolean), text:(d.text||"").slice(0,40000), createdAt:now(), status:"screening",
+    versions:[{v:1, hash, salt, at:now(), fileName:d.fileName||"manuscript-text.txt", size:d.fileSize||(d.text||"").length}], reviews:[], escrow:SPLIT[0].amt, slots:SLOTS};
+  S.manuscripts.unshift(ms);
+  credit(-FEE, "Submission fee", id);
+  SPLIT.forEach(s=>S.pools[s.k]+=s.amt);
+  await chain("SubmissionProof", id, {versionHash:hash, v:1});
+  await chain("FeeEscrowed", id, {amount:FEE});
+  save();
+  UI.sel = id; UI.step = 3; UI.draft = null; UI.aiBusy[id] = 0; render();
+  burst("−"+FEE, $(".balance"));
+  const timer = setInterval(()=>{ if(UI.aiBusy[id]===undefined) return clearInterval(timer); UI.aiBusy[id]=Math.min(THINK.length-1,(UI.aiBusy[id]||0)+1); const el=document.getElementById("think-"+id); if(el) el.outerHTML = aiThinking(ms); }, 1700);
+  const report = await runAIEditor(ms);
+  clearInterval(timer); delete UI.aiBusy[id];
+  ms.ai = report; ms.status = "editor_check";
+  await chain("AIScreeningLogged", id, {overall:report.overall, rec:report.recommendation, reportHash:await sha256(JSON.stringify(report))});
+  save(); render();
+  toast(`AI Editor finished: score <b>${report.overall}</b>, ${REC[report.recommendation].t.toLowerCase()}.`);
+}
+
+/* ---------- editor ---------- */
+async function edDecide(id){
+  const ms = msById(id), a = UI.edPick.a, note = ($("#ed-note").value||"").trim();
+  const agrees = a===ms.ai.recommendation;
+  if(!agrees && note.length<10){ toast("Add a short reason when you override the AI Editor."); $("#ed-note").focus(); return; }
+  ms.editorDecision = {action:a, agreesWithAI:agrees, note, at:now(), by:S.user.name};
+  await chain("EditorDecision", id, {action:a, agreesWithAI:agrees});
+  if(a==="send_to_review"){ ms.status="in_review"; toast("Sent to the review pool. Two reviewer slots are open."); }
+  else if(a==="revise_before_review"){ ms.status="pre_revise"; toast("Author asked to revise before review."); }
+  else { ms.status="desk_rejected";
+    const back = ms.escrow; S.pools.reviewer -= back; ms.escrow = 0;
+    if(isMine(ms)) credit(back, "Reviewer reserve returned after desk rejection", id);
+    await chain("EscrowReturned", id, {amount:back});
+    toast(`Desk rejected. ${back} tPLIB reviewer reserve returned to the author.`); }
+  UI.edPick=null; save(); render();
+}
+const SIM_REVIEWS = [
+  {recommendation:"minor", form:{contribution:"The question is timely and the design is appropriate. The contribution is clearest in the results on explanations; the introduction could foreground this.",
+    method:"The factorial design is well powered for main effects but likely underpowered for the four-way interaction. Please report a sensitivity power analysis and treat interaction results as exploratory.",
+    evidence:"Effect sizes are reported with confidence intervals, which is good. Table 3 should report the cell sizes per condition and the manipulation check pass rates.",
+    clarity:"Clear and well organised. The vignette text should be included in an appendix so others can replicate.",
+    ethics:"Ethics approval reference is given. Please describe how respondent data were de-identified before sharing on OSF.",
+    revisions:"1) Sensitivity power analysis. 2) Cell sizes and manipulation checks. 3) Vignette text in appendix. 4) Reframe interaction effects as exploratory.",
+    confidential:"No concerns. A solid paper."}},
+  {recommendation:"major", form:{contribution:"Relevant to the journal, though related to existing work on algorithmic fairness perceptions in hiring. The paper should engage with that literature to show what is specific to peer review.",
+    method:"Sampling from corresponding authors may over-represent senior, research-active academics. A comparison with population characteristics would help. The single-item trust measures in the pilot are mentioned but not used; please clarify.",
+    evidence:"The audit-trail effect is interesting but the vignette describes the trail rather than showing it. Respondents may not have understood it. A comprehension check is needed.",
+    clarity:"Figure 2 is hard to read in greyscale. Some abbreviations are not defined.",
+    ethics:"Fine. Consent procedure is described.",
+    revisions:"1) Engage with algorithmic fairness literature. 2) Sample representativeness. 3) Comprehension check for audit-trail condition. 4) Improve Figure 2.",
+    confidential:""}}
+];
+async function simReviewer(id){
+  const ms = msById(id); const n = ms.reviews.length;
+  const tpl = SIM_REVIEWS[n % SIM_REVIEWS.length];
+  const alias = "Reviewer R-"+(20+Math.floor(Math.random()*70));
+  const rv = {id:"rv-"+rid(3), reviewerId:"sim-"+rid(2), alias, status:"submitted", acceptedAt:now()-9*DAY, dueAt:now()+5*DAY, submittedAt:now()-Math.floor(Math.random()*3)*DAY, recommendation:tpl.recommendation, form:JSON.parse(JSON.stringify(tpl.form))};
+  ms.escrow = Math.max(0, ms.escrow-BASE_REWARD);
+  ms.reviews.push(rv);
+  await chain("ReviewerAssigned", id, {reviewer:alias.replace("Reviewer ",""), reserved:BASE_REWARD});
+  rv.coach = await runCoach(ms, rv.form);
+  await chain("ReviewSubmitted", id, {reviewer:alias.replace("Reviewer ",""), reportHash:await sha256(JSON.stringify(rv.form))});
+  save(); render(); toast(`${alias} accepted and submitted a report. It's waiting for your validation.`);
+}
+async function validate(id, rvId, btn){
+  const ms = msById(id), rv = ms.reviews.find(r=>r.id===rvId);
+  const Q = Number(UI.qv[rvId] ?? (rv.coach?rv.coach.suggested_Q:1)), T = timeliness(rv), C = UI.cv[rvId]===false?0:1;
+  const R = reward(BASE_REWARD,Q,T,C);
+  rv.status="validated"; rv.Q=Q; rv.T=T; rv.C=C; rv.reward=R; rv.validatedAt=now();
+  S.pools.reviewer -= R;
+  if(R < BASE_REWARD) await chain("EscrowReturned", id, {amount:Math.round((BASE_REWARD-R)*100)/100});
+  await chain("ReviewValidated", id, {reviewer:rv.alias?rv.alias.replace("Reviewer ",""):"you"});
+  await chain("RewardReleased", null, {R, batched:true});
+  if(rv.reviewerId===S.user.id){
+    credit(R, "Review reward (validated)", id);
+    S.reputation.validated += 1; S.reputation.attestations.unshift({msId:id, at:now(), journal:journal(ms.journalId).short, Q});
+    await chain("ReputationAttested", null, {item:"Validated review, "+journal(ms.journalId).short});
+    burst("+"+fmt(R), btn);
+  }
+  save(); render(); toast(`Validated. <span class="mono">${fmt(R)} tPLIB</span> released to ${rv.reviewerId===S.user.id?"you":esc(rv.alias)} in the next batched payout.`);
+}
+async function returnReview(id, rvId){
+  const ms = msById(id), rv = ms.reviews.find(r=>r.id===rvId);
+  rv.status = "accepted"; rv.submittedAt = null; rv.dueAt = Math.max(rv.dueAt, now()+5*DAY);
+  save(); render(); toast("Returned to the reviewer with a request to expand the report.");
+  if(rv.reviewerId.startsWith("sim-")) setTimeout(async ()=>{
+    rv.form.revisions += " 5) Please also report robustness checks for the main effects and discuss external validity in a dedicated limitations section.";
+    rv.status="submitted"; rv.submittedAt=now(); rv.coach = await runCoach(ms, rv.form);
+    await chain("ReviewSubmitted", id, {reviewer:rv.alias.replace("Reviewer ","")});
+    save(); render(); toast(esc(rv.alias)+" expanded and resubmitted the report.");
+  }, 4000);
+}
+async function finalDecision(id, a){
+  const ms = msById(id), note = ($("#final-note")&&$("#final-note").value||"").trim();
+  ms.finalDecision = {action:a, note, at:now()};
+  await chain("EditorDecision", id, {action:a});
+  if(a==="accept"){ ms.status="published"; ms.publishedAt=now(); ms.cid = "bafybei"+rid(14).slice(0,26); await chain("Published", id, {cid:ms.cid}); toast("Accepted and published. A public copy is pinned to IPFS."); }
+  else if(a==="reject"){ ms.status="rejected"; toast("Decision recorded: reject."); }
+  else { ms.status="revision_requested"; toast(`Decision recorded: ${RECO[a].toLowerCase()}.`); }
+  // unreserved escrow returns to pool
+  if(ms.escrow>0 && ["published","rejected"].includes(ms.status)){ await chain("EscrowReturned", id, {amount:ms.escrow}); ms.escrow=0; }
+  save(); render();
+}
+async function submitRevision(id){
+  const ms = msById(id); const f = UI.revFile && UI.revFile.id===id ? UI.revFile : null;
+  if(!f){ toast("Choose the revised file first."); return; }
+  const salt = rid(16); const hash = await saltedHash(f.bytes, salt);
+  ms.versions.push({v:ms.versions.length+1, hash, salt, at:now(), fileName:f.name, size:f.size});
+  await chain("RevisionProof", id, {versionHash:hash, v:ms.versions.length});
+  ms.status = ms.status==="pre_revise" ? "editor_check" : "revised";
+  UI.revFile=null; save(); render(); toast(`Version ${ms.versions.length} recorded with a new fingerprint.`);
+}
+
+/* ---------- reviewer ---------- */
+async function acceptReview(id){
+  const ms = msById(id);
+  if(isMine(ms)){ toast("You can't review your own manuscript."); return; }
+  if(openSlots(ms)<=0){ toast("This request was just filled."); return; }
+  const rv = {id:"rv-"+rid(3), reviewerId:S.user.id, alias:"Reviewer R-"+(10+Math.floor(Math.random()*80)), status:"accepted", acceptedAt:now(), dueAt:now()+14*DAY};
+  ms.reviews.push(rv); ms.escrow = Math.max(0, ms.escrow-BASE_REWARD);
+  await chain("ReviewerAssigned", id, {reviewer:rv.alias.replace("Reviewer ",""), reserved:BASE_REWARD});
+  save(); UI.sel=id; UI.view="reviewform"; UI.from="pool"; render(); window.scrollTo(0,0);
+  toast(`${BASE_REWARD} tPLIB reserved in escrow for your review.`);
+}
+async function coach(id){
+  const f = UI.rform[id]; const ms = msById(id);
+  if(Object.entries(f).filter(([k])=>!["recommendation","confidential"].includes(k)).every(([,v])=>!v.trim())){ toast("Write at least one section first."); return; }
+  UI.coachBusy=true; render();
+  const {recommendation, ...rest} = f;
+  UI.coach[id] = await runCoach(ms, rest);
+  UI.coachBusy=false; render();
+}
+async function submitReview(id){
+  const ms = msById(id), rv = ms.reviews.find(r=>r.reviewerId===S.user.id), f = UI.rform[id];
+  const req = ["contribution","method","evidence","revisions"].filter(k=>!f[k].trim());
+  if(req.length){ toast("Please complete: "+req.join(", ")+"."); return; }
+  if(!f.recommendation){ toast("Choose a recommendation."); return; }
+  const {recommendation, ...form} = f;
+  rv.form = form; rv.recommendation = recommendation; rv.status = "submitted"; rv.submittedAt = now();
+  rv.coach = UI.coach[id] || await runCoach(ms, form);
+  await chain("ReviewSubmitted", id, {reviewer:rv.alias.replace("Reviewer ",""), reportHash:await sha256(JSON.stringify(form))});
+  save(); go("pool");
+  toast("Review submitted. An editor will validate it and release your reward."+(S.user.roles.includes("editor")?" Switch to Editor to try validating it.":""));
+}
+
+/* ---------- wallet / market ---------- */
+async function redeem(id, btn){
+  const m = MARKET.find(x=>x.id===id); if(S.credits<m.price) return;
+  credit(-m.price, (m.kind==="Waiver"?"Donated: ":"Redeemed: ")+m.title);
+  if(m.kind==="Waiver") S.pools.waiver += m.price;
+  S.redemptions.push({id, at:now()});
+  await chain("Redeemed", null, {item:m.title, amount:m.price});
+  save(); render(); burst("−"+m.price, $(".balance"));
+  toast(m.kind==="Waiver"?"Thank you. Your credits now fund an author who can't pay the fee.":`Redeemed. Your voucher for ${esc(m.partner)} is on its way.`);
+}
+async function sponsor(){
+  const code = ($("#sp-code").value||"").trim().toUpperCase();
+  if(!code){ toast("Enter a sponsor code."); return; }
+  if((S.usedCodes||[]).includes(code)){ toast("This code was already used on your account."); return; }
+  if(!/^[A-Z]{2,}-[A-Z0-9]{3,}$/.test(code)){ toast("That code isn't recognised. Codes look like AIT-PILOT."); return; }
+  S.usedCodes = [...(S.usedCodes||[]), code];
+  credit(200, "Sponsored credits ("+code+")"); await chain("CreditsIssued", null, {to:S.user.wallet, amount:200, item:"sponsor "+code});
+  save(); render(); gcDone("Sponsored credits added", `Your institution's code ${esc(code)} added 200 credits.`);
+}
+async function waiver(){
+  if(S.pools.waiver < 10){ toast("The waiver pool is empty right now."); return; }
+  const amt = Math.min(FEE, Math.floor(S.pools.waiver));
+  S.pools.waiver -= amt; credit(amt, "Waiver granted from researcher inclusion pool");
+  await chain("CreditsIssued", null, {to:S.user.wallet, amount:amt, item:"waiver"});
+  save(); render(); gcDone("Waiver approved", `${amt} credits from the researcher inclusion pool were added. In the live app an editor reviews each request first.`);
+}
+/* ---------- get credits sheet ---------- */
+function openGC(tab){ UI.gc = {tab:tab||(S.credits<FEE?"card":"card"), pack:0, stage:"form", busy:false}; modal(viewGetCredits()); }
+function gcRender(){ if(!$("#scrim")) return; $("#scrim .modal").innerHTML = viewGetCredits(); }
+function gcDone(title, text, receipt){ if(!UI.gc) return; Object.assign(UI.gc, {stage:"done", busy:false, doneTitle:title, doneText:text, receipt:receipt||""}); if($("#scrim")) gcRender(); else toast(esc(title)); }
+async function gcPayCard(){
+  const num = ($("#cc-num").value||"").replace(/\s/g,""), exp = ($("#cc-exp").value||"").replace(/\s/g,""), cvc = ($("#cc-cvc").value||"").trim();
+  if(!/^\d{15,16}$/.test(num)){ toast("Enter a valid card number. In the demo use 4242 4242 4242 4242."); return; }
+  if(!/^(0[1-9]|1[0-2])\/\d{2}$/.test(exp)){ toast("Enter the expiry as MM / YY."); return; }
+  if(!/^\d{3,4}$/.test(cvc)){ toast("Enter the 3 or 4 digit CVC."); return; }
+  if(num==="4000000000000002"){ toast("The card was declined. Try another card."); return; }
+  const p = PACKS[UI.gc.pack]; UI.gc.busy = true; gcRender();
+  await new Promise(r=>setTimeout(r,1400));
+  const receipt = "pi_"+rid(10);
+  credit(p.n, `Purchased ${p.n} credits by card (USD ${fmt(packPrice(p))})`);
+  await chain("CreditsIssued", null, {to:S.user.wallet, amount:p.n, item:"card purchase"});
+  save(); render(); gcDone("Payment received", `${p.n} credits were added. A receipt for USD ${fmt(packPrice(p))} would be emailed to you.`, receipt);
+}
+async function gcPayUsdc(){
+  const p = PACKS[UI.gc.pack]; UI.gc.busy = true; gcRender();
+  if(window.ethereum){ try{ await window.ethereum.request({method:"eth_requestAccounts"}); }catch(e){ UI.gc.busy=false; gcRender(); toast("Wallet connection was cancelled."); return; } }
+  await new Promise(r=>setTimeout(r,1600));
+  const tx = "0x"+rid(32);
+  credit(p.n, `Purchased ${p.n} credits with ${fmt(packPrice(p))} USDC`);
+  await chain("CreditsIssued", null, {to:S.user.wallet, amount:p.n, item:"USDC purchase"});
+  save(); render(); gcDone("Payment confirmed", `${fmt(packPrice(p))} USDC received. ${p.n} credits were added to your account.`, short(tx));
+}
+function gcInvoice(){
+  const inst = ($("#iv-inst").value||"").trim(), email = ($("#iv-email").value||"").trim(), n = $("#iv-n").value;
+  if(!inst){ toast("Add the institution's name."); return; }
+  if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)){ toast("Add a valid billing email."); return; }
+  gcDone("Invoice requested", `An invoice for ${Number(n).toLocaleString()} credits will go to ${esc(email)} for ${esc(inst)}. Credits are released when it's paid. (Demo: nothing is sent.)`);
+}
+async function faucet(){ credit(100, "Test faucet"); await chain("CreditsIssued", null, {to:S.user.wallet, amount:100}); save(); render(); }
+async function linkWallet(){
+  if(window.ethereum){ try{ const [a] = await window.ethereum.request({method:"eth_requestAccounts"}); S.user.linkedWallet=a; S.user.wallet=a; S.user.method="wallet"; await chain("AccountLinked",null,{method:"wallet"}); save(); render(); toast("Wallet linked."); return; }catch(e){ toast("Wallet linking was cancelled."); return; } }
+  modal(`<h3>No browser wallet found here</h3><p class="small muted">Wallet extensions can't reach this sandboxed preview. On the deployed site this links MetaMask or another wallet to your account, and your credits move with it.</p><div class="row" style="justify-content:flex-end"><button class="btn primary" data-act="closeModal">OK</button></div>`);
+}
+async function verifyFile(file){
+  const salt = ($("#vf-salt").value||"").trim(); const out = $("#vf-out");
+  const bytes = await file.arrayBuffer();
+  const candidates = S.manuscripts.flatMap(m=>m.versions.map(v=>({m,v})));
+  for(const {m,v} of candidates){
+    if(salt && !v.salt.startsWith(salt)) continue;
+    const h = await saltedHash(bytes, v.salt);
+    if(h===v.hash){ out.innerHTML = `<div class="verdict ok">${I.check.replace('<svg','<svg width="18" height="18"')}Match: ${m.id} version ${v.v}, recorded ${ftime(v.at)}</div>`; return; }
+  }
+  out.innerHTML = `<div class="verdict bad">No recorded version matches this file${salt?" and salt":""}.</div>`;
+}
+
+/* ---------- events ---------- */
+function setPath(path, val){ const ks = path.split("."); let o = UI; for(let i=0;i<ks.length-1;i++){ o = o[ks[i]] = o[ks[i]] || {}; } o[ks[ks.length-1]] = val; }
+document.addEventListener("input", e=>{
+  const el = e.target;
+  if(el.dataset.bind){ setPath(el.dataset.bind, el.type==="checkbox"?el.checked:el.value); if(el.dataset.bind==="draft.journalId") render(); }
+  if(el.dataset.act==="qv"){ UI.qv[el.dataset.id]=Number(el.value); const pos=el.selectionStart; render(); const n=$("#q-"+el.dataset.id); n&&n.focus(); }
+  if(el.id && el.id.startsWith("otp")){ el.value = el.value.replace(/\D/g,""); const i=+el.id.slice(3); if(el.value && i<5) $("#otp"+(i+1)).focus(); }
+});
+document.addEventListener("paste", e=>{
+  const el = e.target; if(!(el.id && el.id.startsWith("otp"))) return;
+  const t = (e.clipboardData.getData("text")||"").replace(/\D/g,"").slice(0,6); if(!t) return; e.preventDefault();
+  t.split("").forEach((c,i)=>{ const f=$("#otp"+i); if(f) f.value=c; });
+});
+document.addEventListener("keydown", e=>{
+  if(e.key==="Enter" && e.target.id==="email") sendOtp();
+  if(e.key==="Backspace" && e.target.id && e.target.id.startsWith("otp") && !e.target.value){ const i=+e.target.id.slice(3); if(i>0) $("#otp"+(i-1)).focus(); }
+  if(e.key==="Enter" && e.target.classList.contains("ms")) e.target.click();
+  if(e.key==="Escape") closeModal();
+});
+document.addEventListener("change", async e=>{
+  const el = e.target;
+  if(el.id==="d-file") onDraftFile(el.files[0]);
+  if(el.id==="rev-file" && el.files[0]){ const f=el.files[0]; UI.revFile={id:el.dataset.id, name:f.name, size:f.size, bytes:await f.arrayBuffer()}; render(); }
+  if(el.id==="vf-file" && el.files[0]) verifyFile(el.files[0]);
+  if(el.dataset.act==="filter"){ UI.filter = el.value; render(); }
+  if(el.dataset.act==="cv"){ UI.cv[el.dataset.id] = el.checked; render(); }
+  if(el.dataset.act==="toggleRole"){ const u=UI.pendingUser, r=el.dataset.r; const name=$("#ob-name").value, exp=$("#ob-exp").value, orc=$("#ob-orcid").value; u.name=name; u.orcid=orc;
+    u.roles = el.checked ? [...new Set([...u.roles, r])] : u.roles.filter(x=>x!==r); render(); $("#ob-exp").value=exp; }
+});
+document.addEventListener("dragover", e=>{ const d=e.target.closest&&e.target.closest("#drop"); if(d){ e.preventDefault(); d.classList.add("over"); } });
+document.addEventListener("dragleave", e=>{ const d=e.target.closest&&e.target.closest("#drop"); if(d) d.classList.remove("over"); });
+document.addEventListener("drop", e=>{ const d=e.target.closest&&e.target.closest("#drop"); if(d){ e.preventDefault(); onDraftFile(e.dataTransfer.files[0]); } });
+
+document.addEventListener("click", async e=>{
+  const el = e.target.closest("[data-act]"); if(!el) return;
+  const a = el.dataset.act; const id = el.dataset.id;
+  if(["qv","cv","toggleRole","filter"].includes(a)) return;
+  if(el.tagName==="A") e.preventDefault();
+  switch(a){
+    case "walletBrowser": return walletBrowser();
+    case "walletTest": closeModal(); return startOnboard({method:"wallet", via:"test", wallet:randAddr()});
+    case "sendOtp": return sendOtp();
+    case "verifyOtp": return verifyOtp();
+    case "cancelOtp": UI.otp=null; return render();
+    case "google": return googleSignIn();
+    case "orcid": return orcidSignIn();
+    case "demoProviderGo": return demoProviderGo(el.dataset.p);
+    case "finishOnboard": return finishOnboard();
+    case "logout": S.user=null; UI.pendingUser=null; UI.otp=null; try{ localStorage.removeItem(STORE_KEY); }catch(x){} S=null; return render();
+    case "go": UI.step = el.dataset.v==="submit" && UI.step===3 ? 1 : UI.step; return go(el.dataset.v);
+    case "role": S.user.activeRole = el.dataset.r; save(); if(["submit","mine","pool","desk"].includes(UI.view)) UI.view = {author:"mine",reviewer:"pool",editor:"desk"}[el.dataset.r]; return render();
+    case "open": if(UI.view==="submit") UI.from="mine"; else if(!["detail","reviewform"].includes(UI.view)) UI.from=UI.view; UI.sel = id; UI.view="detail"; render(); return window.scrollTo(0,0);
+    case "loadExample": UI.draft = Object.assign(newDraft(), EXAMPLE_SUB); return render();
+    case "toStep2": { const d=UI.draft; if(!d.title.trim()||d.abstract.trim().split(/\s+/).length<20){ toast("Add a title and an abstract of at least 20 words."); return; } UI.step=2; return render(); }
+    case "step": UI.step = +el.dataset.s; return render();
+    case "pay": return pay(el);
+    case "edPick": UI.edPick = {id, a:el.dataset.a}; return render();
+    case "edDecide": return edDecide(id);
+    case "simReviewer": el.disabled=true; return simReviewer(id);
+    case "validate": el.disabled=true; return validate(id, el.dataset.r, el);
+    case "returnReview": return returnReview(id, el.dataset.r);
+    case "final": return finalDecision(id, el.dataset.a);
+    case "submitRevision": return submitRevision(id);
+    case "acceptReview": el.disabled=true; return acceptReview(id);
+    case "writeReview": UI.sel=id; UI.view="reviewform"; UI.from="pool"; render(); return window.scrollTo(0,0);
+    case "coach": return coach(id);
+    case "submitReview": return submitReview(id);
+    case "redeem": return redeem(id, el);
+    case "getCredits": return openGC(el.dataset.tab);
+    case "gcTab": UI.gc.tab = el.dataset.tab; return gcRender();
+    case "gcPack": UI.gc.pack = +el.dataset.i; return gcRender();
+    case "gcPayCard": return gcPayCard();
+    case "gcPayUsdc": return gcPayUsdc();
+    case "gcInvoice": return gcInvoice();
+    case "gcClose": closeModal(); UI.gc=null; return render();
+    case "sponsor": return sponsor();
+    case "waiver": return waiver();
+    case "faucet": return faucet();
+    case "linkWallet": return linkWallet();
+    case "closeModal": return closeModal();
+  }
+});
+
+/* ---------- engraved guilloche backdrop + animated provenance certificate ---------- */
+let artRAF = null, certTimer = null;
+function startArt(){
+  const c = document.getElementById("guilloche"); if(!c){ stopArt(); return; }
+  if(c.dataset.on) return; c.dataset.on = "1";
+  const ctx = c.getContext("2d"), reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const r = c.getBoundingClientRect(), dpr = Math.min(2, devicePixelRatio||1);
+  c.width = r.width*dpr; c.height = r.height*dpr;
+  const W = c.width, H = c.height, cx = W*0.82, cy = H*0.42, R = Math.max(W,H)*0.55;
+  let t = 0;
+  const draw = () => {
+    if(!document.body.contains(c)){ artRAF=null; return; }
+    ctx.clearRect(0,0,W,H);
+    ctx.lineWidth = dpr*0.8;
+    for(let k=0;k<14;k++){
+      const rr = R*(0.35+k*0.05);
+      ctx.strokeStyle = k%4===0 ? "rgba(215,182,110,.30)" : "rgba(200,212,235,.12)";
+      ctx.beginPath();
+      for(let i=0;i<=720;i++){
+        const a = i/720*Math.PI*2;
+        const m = rr + Math.sin(a*18 + t + k*0.4)*R*0.035 + Math.cos(a*7 - t*0.6)*R*0.02;
+        const x = cx + Math.cos(a)*m, y = cy + Math.sin(a)*m*0.92;
+        i ? ctx.lineTo(x,y) : ctx.moveTo(x,y);
+      }
+      ctx.stroke();
+    }
+    t += 0.0035;
+    artRAF = reduce ? null : requestAnimationFrame(draw);
+  };
+  draw();
+  const cert = document.getElementById("cert");
+  if(cert && !certTimer){
+    let k = 0;
+    const tick = async () => {
+      const el = document.getElementById("cert"); if(!el){ clearInterval(certTimer); certTimer=null; return; }
+      const steps = el.querySelectorAll(".cert-steps div"); const seal = el.querySelector(".cert-seal");
+      steps.forEach((s,i)=>s.classList.toggle("on", i<=k));
+      seal.classList.toggle("on", k>=3);
+      const h = document.getElementById("cert-hash"); if(h) h.textContent = (k>=1? "block 6,1"+(28440+k*3)+" · ":"") + await sha256("PL-2026-0118"+k);
+      k = (k+1) % 6;
+    };
+    tick(); if(!reduce) certTimer = setInterval(tick, 1500);
+  }
+}
+function stopArt(){ if(artRAF){ cancelAnimationFrame(artRAF); artRAF=null; } if(certTimer){ clearInterval(certTimer); certTimer=null; } }
+
+/* ---------- real Google and ORCID sign-in ----------
+   Fill in the client IDs once PeerLibre is hosted on its own domain (see README). Inside the claude.ai preview
+   third-party sign-in can't run, so these buttons fall back to a clearly labelled demo profile. */
+const AUTH_CONFIG = {
+  googleClientId: "",      // Google Cloud console > APIs & Services > Credentials > OAuth client ID (Web)
+  orcidClientId: "",       // orcid.org/developer-tools (Public API client), e.g. "APP-XXXXXXXXXXXXXXXX"
+  orcidBase: "https://orcid.org"   // use "https://sandbox.orcid.org" while testing
+};
+const AUTH = {
+  hosted(){ return location.protocol==="https:" || location.hostname==="localhost"; },
+  live(p){ return this.hosted() && !!(p==="google" ? AUTH_CONFIG.googleClientId : AUTH_CONFIG.orcidClientId); }
+};
+function decodeJwt(t){ try{ const p=t.split(".")[1].replace(/-/g,"+").replace(/_/g,"/"); return JSON.parse(decodeURIComponent(escape(atob(p)))); }catch(e){ return {}; } }
+async function googleSignIn(){
+  if(!AUTH.live("google")) return demoProvider("google");
+  try{
+    await loadScript("https://accounts.google.com/gsi/client");
+    const client = google.accounts.oauth2.initTokenClient({client_id:AUTH_CONFIG.googleClientId, scope:"openid email profile",
+      callback: async (resp) => {
+        if(resp.error){ toast("Google sign-in was cancelled."); return; }
+        const r = await fetch("https://www.googleapis.com/oauth2/v3/userinfo",{headers:{Authorization:"Bearer "+resp.access_token}});
+        const p = await r.json();
+        startOnboard({method:"google", via:"google", verified:true, wallet:randAddr(), name:p.name||"", email:p.email||"", picture:p.picture||""});
+      }});
+    client.requestAccessToken();
+  }catch(e){ toast("Google sign-in couldn't start. Check the client ID and authorised origins."); }
+}
+function orcidSignIn(){
+  if(!AUTH.live("orcid")) return demoProvider("orcid");
+  const state = rid(8); try{ sessionStorage.setItem("pl.orcid.state", state); }catch(e){}
+  const redirect = location.origin + location.pathname;
+  location.href = `${AUTH_CONFIG.orcidBase}/oauth/authorize?client_id=${encodeURIComponent(AUTH_CONFIG.orcidClientId)}&response_type=token&scope=openid&redirect_uri=${encodeURIComponent(redirect)}&state=${state}&nonce=${rid(8)}`;
+}
+function handleOrcidReturn(){
+  if(!location.hash.includes("id_token=") && !location.hash.includes("access_token=")) return false;
+  const q = new URLSearchParams(location.hash.slice(1));
+  history.replaceState(null, "", location.pathname);
+  let expected=null; try{ expected = sessionStorage.getItem("pl.orcid.state"); }catch(e){}
+  try{ sessionStorage.removeItem("pl.orcid.state"); }catch(e){}
+  if(!expected || q.get("state")!==expected){ toast("ORCID sign-in could not be verified. Please try again."); return false; }
+  const p = decodeJwt(q.get("id_token")||"");
+  const name = [p.given_name, p.family_name].filter(Boolean).join(" ");
+  startOnboard({method:"orcid", via:"orcid", verified:true, wallet:randAddr(), name, orcid:p.sub||""});
+  return true;
+}
+function demoProvider(p){
+  const label = p==="google" ? "Google" : "ORCID";
+  modal(`<div class="row">${p==="google"?I.google.replace('<svg','<svg width="28" height="28"'):I.orcid.replace('<svg','<svg width="28" height="28"')}<h3>${label} sign-in (preview)</h3></div>
+    <p class="small muted">Real ${label} sign-in is built in and switches on once PeerLibre runs on its own website with a registered ${label} app. This preview can't open ${label}'s sign-in window, so enter the profile you'd like to test with.</p>
+    <label class="field">Full name<input class="input" id="dp-name" placeholder="Dr. Jane Doe"></label>
+    ${p==="google"?`<label class="field">Google email<input class="input" id="dp-email" type="email" placeholder="you@gmail.com"></label>`:`<label class="field">ORCID iD<input class="input mono" id="dp-orcid" placeholder="0000-0002-1825-0097"></label>`}
+    <div class="row" style="justify-content:flex-end"><button class="btn ghost" data-act="closeModal">Cancel</button><button class="btn primary" data-act="demoProviderGo" data-p="${p}">Continue</button></div>`);
+  setTimeout(()=>{ const n=$("#dp-name"); n&&n.focus(); },30);
+}
+function demoProviderGo(p){
+  const name = ($("#dp-name").value||"").trim();
+  const email = $("#dp-email") ? $("#dp-email").value.trim() : "";
+  let orcid = $("#dp-orcid") ? $("#dp-orcid").value.trim() : "";
+  if(p==="orcid" && orcid && !/^\d{4}-\d{4}-\d{4}-\d{3}[\dX]$/.test(orcid)){ toast("An ORCID iD looks like 0000-0002-1825-0097."); return; }
+  if(p==="orcid" && !orcid) orcid = "0000-0002-"+String(1000+Math.floor(Math.random()*8999))+"-"+String(1000+Math.floor(Math.random()*8999));
+  closeModal(); startOnboard({method:p, via:p, wallet:randAddr(), name, email, orcid});
+}
+
+/* ---------- boot ---------- */
+S = load();
+if(S && S.user){ UI.view="dashboard"; UI.from="dashboard"; }
+if(!(S && S.user) && handleOrcidReturn()){ /* onboarding rendered */ } else render();
+getSample();
+
+</script>
+</body></html>
