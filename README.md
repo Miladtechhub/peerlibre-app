@@ -4,6 +4,8 @@ Version 1, a clickable prototype of PeerLibre: transparent, credit-based peer re
 
 ![PeerLibre](brand/peerlibre-logo-preview.png)
 
+**Live preview:** https://msa2asm.github.io/peerlibre-app/
+
 ## Try it
 
 - Open `index.html` in any browser. There is nothing to install.
